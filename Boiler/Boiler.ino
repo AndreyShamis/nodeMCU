@@ -14,33 +14,35 @@ extern "C" {
 #include "FS.h"
 #include <OneWire.h>
 #include <DallasTemperature.h>
-const int led = 13;
-const char* ssid = "RadiationG";
-const char* password = "polkalol";
-#define ONE_WIRE_BUS D4 //D4 2
-// Time to sleep (in seconds):
-const int sleepTimeS = 10;
+
+#define               ONE_WIRE_BUS D4 //D4 2
+const int led         = 13;
+const char* ssid      = "RadiationG";
+const char* password  = "polkalol";
+const int sleepTimeS  = 10;  // Time to sleep (in seconds):
+int counter           = 0;
+
+OneWire             oneWire(ONE_WIRE_BUS);
+DallasTemperature   sensor(&oneWire);
+ESP8266WebServer    server(80);
+DeviceAddress       insideThermometer; // arrays to hold device address
+
+//enum ADCMode {
+//    ADC_TOUT = 33,
+//    ADC_TOUT_3V3 = 33,
+//    ADC_VCC = 255,
+//    ADC_VDD = 255
+//};
 ADC_MODE(ADC_VCC);
-OneWire oneWire(ONE_WIRE_BUS);
-DallasTemperature sensor(&oneWire);
-ESP8266WebServer server(80);
-// arrays to hold device address
-DeviceAddress insideThermometer;
 
 float getTemperature() {
-  float temp;
-//  do {
-    sensor.requestTemperatures();
-    temp = sensor.getTempC(insideThermometer);
-//    delay(100);
-//  } while (temp == 85.0 || temp == (-127.0));
-//  return temp;
+  sensor.requestTemperatures();
+  return sensor.getTempC(insideThermometer);
 }
 
 void handleRoot() {
-  //digitalWrite(led, 1);
-  //delay(20);
-  float tempC = getTemperature();
+
+  float tempC       = getTemperature();
   Serial.print("Temp C: ");
   Serial.println(tempC);
   String tmp = String(tempC);
@@ -49,21 +51,14 @@ void handleRoot() {
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(200, "text/html", message);
-  //digitalWrite(led, 0);
-
-
 }
 
 void handleNotFound(){
   digitalWrite(led, 1);
   String message = "File Not Found\n\n";
-  message += "URI: ";
-  message += server.uri();
-  message += "\nMethod: ";
+  message += "URI: " + server.uri() + "\nMethod: ";
   message += (server.method() == HTTP_GET)?"GET":"POST";
-  message += "\nArguments: ";
-  message += server.args();
-  message += "\n";
+  message += "\nArguments: " + server.args() + "\n";
   for (uint8_t i=0; i<server.args(); i++){
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
@@ -71,8 +66,10 @@ void handleNotFound(){
   digitalWrite(led, 0);
 }
 
-void save_setting(const char* fname,String value)
-{
+/**
+ * 
+ */
+void save_setting(const char* fname,String value){
   File f = SPIFFS.open(fname, "w");
   if (!f){
     Serial.print("Cannot open file:");
@@ -84,20 +81,27 @@ void save_setting(const char* fname,String value)
   Serial.println(value);
   f.close();
 }
-String read_setting(const char* fname)
-{
-  String s = "";
+
+/**
+ * 
+ */
+String read_setting(const char* fname){
+  String s      = "";
   File f = SPIFFS.open(fname , "r");
   if (!f){
     Serial.print("file open failed:");
     Serial.println(fname);
   }
   else{
-    s=f.readStringUntil('\n');
+    s = f.readStringUntil('\n');
     f.close();
   }
   return s;
 }
+
+/**
+ * 
+ */
 void setup(void){
 //ADC_MODE(ADC_VCC);
   pinMode(led, OUTPUT);
@@ -168,7 +172,7 @@ void setup(void){
   Serial.println("ESP8266 in sleep mode");
   
 }
-int counter = 0;
+
 void loop(void){
   
   server.handleClient();
@@ -187,3 +191,4 @@ void loop(void){
   counter++;
 
 }
+
