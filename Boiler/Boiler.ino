@@ -9,6 +9,8 @@ const int led = 13;
 const char* ssid = "RadiationG";
 const char* password = "polkalol";
 #define ONE_WIRE_BUS D4 //D4 2
+// Time to sleep (in seconds):
+const int sleepTimeS = 10;
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensor(&oneWire);
@@ -93,6 +95,7 @@ void setup(void){
   digitalWrite(led, 0);
   sensor.begin();
   Serial.begin(115200);
+  Serial.println("");
   Serial.println("PASS: Serial communication started.");
   Serial.println("INFO: Starting SPIFFS...");
   SPIFFS.begin();
@@ -147,15 +150,29 @@ void setup(void){
   Serial.println("INFO: Staring HTTP server...");
   server.begin();
   Serial.println("PASS: HTTP server started");
-  save_setting("/ssid", ssid);
-  save_setting("/password", password);
-  String test1 = read_setting("/ssid");
-  String test2 = read_setting("/password");
-  Serial.println(test1);
-  Serial.println(test2);
+//  save_setting("/ssid", ssid);
+//  save_setting("/password", password);
+  Serial.println(read_setting("/ssid"));
+  Serial.println(read_setting("/password"));
+      // Sleep
+  Serial.println("ESP8266 in sleep mode");
+  //ESP.deepSleep(sleepTimeS * 1000000);
 }
-
+int counter = 0;
 void loop(void){
+  
   server.handleClient();
-  Serial.println("Here");
+  if(counter > 1000){
+    counter = 0;
+    float tempC = getTemperature();
+    Serial.print("INFO: Temperature C: ");
+    Serial.println(tempC);
+  }
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("WIFI DISCONNECTED");
+    delay(500);
+  }
+  delay(100);
+  counter++;
+
 }
