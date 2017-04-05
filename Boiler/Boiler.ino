@@ -1,3 +1,12 @@
+//deep sleep include
+extern "C" {
+#include "ets_sys.h"
+#include "os_type.h"
+#include "osapi.h"
+#include "mem.h"
+#include "user_interface.h"
+#include "cont.h"
+}
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -11,7 +20,7 @@ const char* password = "polkalol";
 #define ONE_WIRE_BUS D4 //D4 2
 // Time to sleep (in seconds):
 const int sleepTimeS = 10;
-
+ADC_MODE(ADC_VCC);
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensor(&oneWire);
 ESP8266WebServer server(80);
@@ -90,7 +99,7 @@ String read_setting(const char* fname)
   return s;
 }
 void setup(void){
-
+//ADC_MODE(ADC_VCC);
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   sensor.begin();
@@ -107,6 +116,7 @@ void setup(void){
   // Wait for connection
   Serial.print("INFO: Connecting to ");
   Serial.print(ssid);
+  Serial.print(password);
   Serial.println("...");
   while (WiFi.status() != WL_CONNECTED) {
     delay(250);
@@ -156,7 +166,7 @@ void setup(void){
   Serial.println(read_setting("/password"));
       // Sleep
   Serial.println("ESP8266 in sleep mode");
-  //ESP.deepSleep(sleepTimeS * 1000000);
+  
 }
 int counter = 0;
 void loop(void){
@@ -172,6 +182,7 @@ void loop(void){
     Serial.println("WIFI DISCONNECTED");
     delay(500);
   }
+  //ESP.deepSleep(sleepTimeS * 1000000, RF_DEFAULT);
   delay(100);
   counter++;
 
