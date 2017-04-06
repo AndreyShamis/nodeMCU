@@ -58,7 +58,8 @@ void handleNotFound(){
   String message = "File Not Found\n\n";
   message += "URI: " + server.uri() + "\nMethod: ";
   message += (server.method() == HTTP_GET)?"GET":"POST";
-  message += "\nArguments: " + server.args() + "\n";
+  message += "\nArguments: ";
+  message += server.args() + "\n";
   for (uint8_t i=0; i<server.args(); i++){
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
@@ -170,7 +171,7 @@ void setup(void){
   Serial.println(read_setting("/password"));
       // Sleep
   Serial.println("ESP8266 in sleep mode");
-  
+  //ESP.deepSleep(sleepTimeS * 1000000, RF_DEFAULT);
 }
 
 void loop(void){
@@ -182,6 +183,26 @@ void loop(void){
     Serial.print("INFO: Temperature C: ");
     Serial.println(tempC);
   }
+  if(counter == 5){
+    Serial.print("getFlashChipId: ");
+    Serial.println(ESP.getFlashChipId());
+
+    Serial.print("getFlashChipSize: ");
+    Serial.println(ESP.getFlashChipSize());
+
+    Serial.print("getFlashChipSpeed: ");
+    Serial.println(ESP.getFlashChipSpeed());
+
+    Serial.print("getFlashChipMode: ");
+    Serial.println(ESP.getFlashChipMode());
+
+    Serial.print("getResetReason: ");
+    Serial.println(ESP.getResetReason());
+
+    Serial.print("getResetInfo: ");
+    Serial.println(ESP.getResetInfo());
+  }
+  
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WIFI DISCONNECTED");
     delay(500);
