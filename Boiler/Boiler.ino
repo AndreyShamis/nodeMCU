@@ -224,68 +224,22 @@ void loop(void){
     printTemperatureToSerial();
   }
   if(counter == 5){
-    Serial.print("Boiler MODE: ");
-    Serial.println(boilerMode);
-    
-    Serial.print("Boiler status: ");
-    Serial.println(boilerStatus);
+    Serial.println("INFO: -----------------------------------------------------------------------");
+    Serial.println("Boiler MODE: " + String(boilerMode) + "\t Boiler status: " + String(boilerStatus));
+    Serial.println("getFlashChipId: " + String(ESP.getFlashChipId()) + "\t\t getFlashChipSize: " + String(ESP.getFlashChipSize()));
+    Serial.println("getFlashChipSpeed: " + String(ESP.getFlashChipSpeed()) + "\t getFlashChipMode: " + String(ESP.getFlashChipMode()));
+    Serial.println("getSdkVersion: " + String(ESP.getSdkVersion()) + "\t getCoreVersion: " + ESP.getCoreVersion() + "\t getBootVersion: " + ESP.getBootVersion());
+    Serial.println("getBootMode: " + String(ESP.getBootMode()));
+    Serial.println("getCpuFreqMHz: " + String(ESP.getCpuFreqMHz()));
+    Serial.println("getResetReason: " + ESP.getResetReason());
+    Serial.println("getResetInfo: " + ESP.getResetInfo());
+    Serial.println("macAddress: " + WiFi.macAddress() + "\t Channel : " + String(WiFi.channel()) + " RSSI: " + WiFi.RSSI());
+    Serial.println("getSketchSize: " + String(ESP.getSketchSize()) + "\t getFreeSketchSpace: " + String(ESP.getFreeSketchSpace()));
 
-    Serial.print("getFlashChipId: ");
-    Serial.println(ESP.getFlashChipId());
+//    Serial.print("magicFlashChipSize: " + String(ESP.magicFlashChipSize()));
+//    Serial.print("magicFlashChipSpeed: " + String(ESP.magicFlashChipSpeed()));
+//    Serial.print("magicFlashChipMode: " + String(ESP.magicFlashChipMode()));
 
-    Serial.print("getFlashChipSize: ");
-    Serial.println(ESP.getFlashChipSize());
-
-    Serial.print("getFlashChipSpeed: ");
-    Serial.println(ESP.getFlashChipSpeed());
-
-    Serial.print("getFlashChipMode: ");
-    Serial.println(ESP.getFlashChipMode());
-
-    Serial.print("getSdkVersion: ");
-    Serial.println(ESP.getSdkVersion());
-
-    Serial.print("getCoreVersion: ");
-    Serial.println(ESP.getCoreVersion());
-
-    Serial.print("getBootVersion: ");
-    Serial.println(ESP.getBootVersion());
-
-    Serial.print("getBootMode: ");
-    Serial.println(ESP.getBootMode());
-
-    Serial.print("getCpuFreqMHz: ");
-    Serial.println(ESP.getCpuFreqMHz());
-
-    Serial.print("getResetReason: ");
-    Serial.println(ESP.getResetReason());
-
-    Serial.print("getResetInfo: ");
-    Serial.println(ESP.getResetInfo());
-
-    Serial.print("macAddress: ");
-    Serial.println(WiFi.macAddress());
-
-    Serial.print("RSSI: ");
-    Serial.println(WiFi.RSSI());
-
-    Serial.print("channel: ");
-    Serial.println(WiFi.channel());
-//
-//    Serial.print("magicFlashChipSize: ");
-//    Serial.println(ESP.magicFlashChipSize());
-//
-//    Serial.print("magicFlashChipSpeed: ");
-//    Serial.println(ESP.magicFlashChipSpeed());
-//
-//    Serial.print("magicFlashChipMode: ");
-//    Serial.println(ESP.magicFlashChipMode());
-
-    Serial.print("getSketchSize: ");
-    Serial.println(ESP.getSketchSize());
-
-    Serial.print("getFreeSketchSpace: ");
-    Serial.println(ESP.getFreeSketchSpace());
   }
   
   if (WiFi.status() != WL_CONNECTED) {
