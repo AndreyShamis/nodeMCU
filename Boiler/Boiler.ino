@@ -60,7 +60,10 @@ String printTemperatureToSerial(){
 
 void handleRoot() {
   String tmp = printTemperatureToSerial();
-  String message = "<h1> Temperature : " + tmp + "</h1><form action='/eb'><input style='font-size:82px' type='submit' value='Enable Load'></form><form action='/db'><input style='font-size:82px' type='submit' value='Disable Load'></form>";
+  String message = "<h1> Temperature : " + tmp + "</h1>" + 
+  "<form action='/eb'><input style='font-size:82px' type='submit' value='Enable Load'></form>" +
+  "<form action='/db'><input style='font-size:82px' type='submit' value='Disable Load'></form>" +
+  "<form method='POST' action='/save_boilermode'><input type='text' value='" + String(boilerMode)  + "' /><input style='font-size:82px' type='submit' value='Save Boiler mode'></form>";
   for (uint8_t i=0; i<server.args(); i++){
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
@@ -79,12 +82,34 @@ void enableBoiler(){
   }
 }
 
+/**
+ * Disable Boiler
+ */
 void disableBoiler(){
   boilerStatus = 0;
   digitalWrite(BOILER_VCC, 0);
 }
+
+/***
+ * 
+ */
+void saveBoilerMode(){
+  String message = "Saving Boiler Mode\n\n";
+  message += "URI: " + server.uri() + "\nMethod: ";
+  message += (server.method() == HTTP_GET)?"GET":"POST";
+  message += "\nArguments: ";
+  message += server.args() + "\n";
+  for (uint8_t i=0; i<server.args(); i++){
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+  }
+  server.send(200, "text/plain", message);
+  
+}
+
+/**
+ * 
+ */
 void handleNotFound(){
-  enableBoiler();
   String message = "File Not Found\n\n";
   message += "URI: " + server.uri() + "\nMethod: ";
   message += (server.method() == HTTP_GET)?"GET":"POST";
@@ -94,7 +119,6 @@ void handleNotFound(){
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
-  disableBoiler();
 }
 
 /**
@@ -191,6 +215,10 @@ void setup(void){
     disableBoiler();
     handleRoot();
   });
+  server.on("/save_boilermode", [](){
+    saveBoilerMode();
+    handleRoot();
+  });
   server.onNotFound(handleNotFound);
   Serial.println("INFO: Staring HTTP server...");
   server.begin();
@@ -225,17 +253,16 @@ void loop(void){
   }
   if(counter == 5){
     Serial.println("INFO: -----------------------------------------------------------------------");
-    Serial.println("Boiler MODE: " + String(boilerMode) + "\t Boiler status: " + String(boilerStatus));
+    Serial.println("Boiler MODE: " + String(boilerMode) + "\t\t\t Boiler status: " + String(boilerStatus));
     Serial.println("getFlashChipId: " + String(ESP.getFlashChipId()) + "\t\t getFlashChipSize: " + String(ESP.getFlashChipSize()));
     Serial.println("getFlashChipSpeed: " + String(ESP.getFlashChipSpeed()) + "\t getFlashChipMode: " + String(ESP.getFlashChipMode()));
-    Serial.println("getSdkVersion: " + String(ESP.getSdkVersion()) + "\t getCoreVersion: " + ESP.getCoreVersion() + "\t getBootVersion: " + ESP.getBootVersion());
+    Serial.println("getSdkVersion: " + String(ESP.getSdkVersion()) + "\t getCoreVersion: " + ESP.getCoreVersion() + "\t\t getBootVersion: " + ESP.getBootVersion());
     Serial.println("getBootMode: " + String(ESP.getBootMode()));
     Serial.println("getCpuFreqMHz: " + String(ESP.getCpuFreqMHz()));
+    Serial.println("macAddress: " + WiFi.macAddress() + "\t Channel : " + String(WiFi.channel()) + "\t\t\t RSSI: " + WiFi.RSSI());
+    Serial.println("getSketchSize: " + String(ESP.getSketchSize()) + "\t\t getFreeSketchSpace: " + String(ESP.getFreeSketchSpace()));
     Serial.println("getResetReason: " + ESP.getResetReason());
     Serial.println("getResetInfo: " + ESP.getResetInfo());
-    Serial.println("macAddress: " + WiFi.macAddress() + "\t Channel : " + String(WiFi.channel()) + " RSSI: " + WiFi.RSSI());
-    Serial.println("getSketchSize: " + String(ESP.getSketchSize()) + "\t getFreeSketchSpace: " + String(ESP.getFreeSketchSpace()));
-
 //    Serial.print("magicFlashChipSize: " + String(ESP.magicFlashChipSize()));
 //    Serial.print("magicFlashChipSpeed: " + String(ESP.magicFlashChipSpeed()));
 //    Serial.print("magicFlashChipMode: " + String(ESP.magicFlashChipMode()));
