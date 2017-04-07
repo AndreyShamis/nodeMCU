@@ -15,18 +15,29 @@ extern "C" {
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-#define               ONE_WIRE_BUS D4 //D4 2
-const int led         = 13;
+typedef enum{
+  UNDEF   = 0,  //  UNKNOWN
+  MANUAL  = 1,  //  Controlled by USER - manual diable, manual enable, secured by MAX_TMP
+  AUTO    = 2,  //  Controlled by TIME, secured by MAX_TMP
+  KEEP    = 3,  //  Controlled by BOARD, keep temperature between MAX_TMP <> TRASHHOLD_TMP, secured by MAX_TMP
+} BoilerModeType;
+
+#define               ONE_WIRE_BUS  D4 //D4 2
+#define               BOILER_VCC    D7 //D7 13
+
+//const int led         = D7; //13;
 const char* ssid      = "RadiationG";
 const char* password  = "polkalol";
 const int sleepTimeS  = 10;  // Time to sleep (in seconds):
 int counter           = 0;
-
+bool boilerStatus     = 0;
+float MAX_POSSIBLE_TMP = 40;
 OneWire             oneWire(ONE_WIRE_BUS);
 DallasTemperature   sensor(&oneWire);
 ESP8266WebServer    server(80);
 DeviceAddress       insideThermometer; // arrays to hold device address
 
+BoilerModeType boilerMode = UNDEF;
 //enum ADCMode {
 //    ADC_TOUT = 33,
 //    ADC_TOUT_3V3 = 33,
@@ -40,21 +51,40 @@ float getTemperature() {
   return sensor.getTempC(insideThermometer);
 }
 
-void handleRoot() {
-
+String printTemperatureToSerial(){
   float tempC       = getTemperature();
-  Serial.print("Temp C: ");
+  Serial.print("INFO: Temperature C: ");
   Serial.println(tempC);
-  String tmp = String(tempC);
-  String message = "<h1> Temperature : " + tmp + "</h1><form action='/enable_led'><input style='font-size:62px' type='submit' value='Enable Led'></form><form action='/disable_led'><input style='font-size:62px' type='submit' value='Disable Led'></form>";
+  return String(tempC);
+}
+
+void handleRoot() {
+  String tmp = printTemperatureToSerial();
+  String message = "<h1> Temperature : " + tmp + "</h1><form action='/eb'><input style='font-size:82px' type='submit' value='Enable Load'></form><form action='/db'><input style='font-size:82px' type='submit' value='Disable Load'></form>";
   for (uint8_t i=0; i<server.args(); i++){
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
+  message += server.client();
   server.send(200, "text/html", message);
 }
 
+void enableBoiler(){
+  float current_temp = getTemperature();
+  if(current_temp > MAX_POSSIBLE_TMP){
+    Serial.println("ERROR: Current temperature is bigger of possible maximum. " + String(current_temp) + ">" + String(MAX_POSSIBLE_TMP));
+  }
+  else{
+    boilerStatus = 1;
+    digitalWrite(BOILER_VCC, 1);
+  }
+}
+
+void disableBoiler(){
+  boilerStatus = 0;
+  digitalWrite(BOILER_VCC, 0);
+}
 void handleNotFound(){
-  digitalWrite(led, 1);
+  enableBoiler();
   String message = "File Not Found\n\n";
   message += "URI: " + server.uri() + "\nMethod: ";
   message += (server.method() == HTTP_GET)?"GET":"POST";
@@ -64,7 +94,7 @@ void handleNotFound(){
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
-  digitalWrite(led, 0);
+  disableBoiler();
 }
 
 /**
@@ -105,8 +135,8 @@ String read_setting(const char* fname){
  */
 void setup(void){
 //ADC_MODE(ADC_VCC);
-  pinMode(led, OUTPUT);
-  digitalWrite(led, 0);
+  pinMode(BOILER_VCC, OUTPUT);
+  disableBoiler();
   sensor.begin();
   Serial.begin(115200);
   Serial.println("");
@@ -153,12 +183,12 @@ void setup(void){
   server.on("/inline", [](){
     server.send(200, "text/plain", "this works as well");
   });
-  server.on("/enable_led", [](){
-    digitalWrite(led, 1);
+  server.on("/eb", [](){
+    enableBoiler();
     handleRoot();
   });
-  server.on("/disable_led", [](){
-    digitalWrite(led, 0);
+  server.on("/db", [](){
+    disableBoiler();
     handleRoot();
   });
   server.onNotFound(handleNotFound);
@@ -180,13 +210,26 @@ void setup(void){
 void loop(void){
   
   server.handleClient();
+  if(boilerStatus){
+    float current_temp = getTemperature();
+    if(current_temp > MAX_POSSIBLE_TMP){
+      Serial.println("WARNING: Current temperature is bigger of possible maximum. " + String(current_temp) + ">" + String(MAX_POSSIBLE_TMP));
+      Serial.println("WARNING: Disabling Load");
+      disableBoiler();
+    }  
+  }
+  
   if(counter > 1000){
     counter = 0;
-    float tempC = getTemperature();
-    Serial.print("INFO: Temperature C: ");
-    Serial.println(tempC);
+    printTemperatureToSerial();
   }
   if(counter == 5){
+    Serial.print("Boiler MODE: ");
+    Serial.println(boilerMode);
+    
+    Serial.print("Boiler status: ");
+    Serial.println(boilerStatus);
+
     Serial.print("getFlashChipId: ");
     Serial.println(ESP.getFlashChipId());
 
@@ -199,11 +242,50 @@ void loop(void){
     Serial.print("getFlashChipMode: ");
     Serial.println(ESP.getFlashChipMode());
 
+    Serial.print("getSdkVersion: ");
+    Serial.println(ESP.getSdkVersion());
+
+    Serial.print("getCoreVersion: ");
+    Serial.println(ESP.getCoreVersion());
+
+    Serial.print("getBootVersion: ");
+    Serial.println(ESP.getBootVersion());
+
+    Serial.print("getBootMode: ");
+    Serial.println(ESP.getBootMode());
+
+    Serial.print("getCpuFreqMHz: ");
+    Serial.println(ESP.getCpuFreqMHz());
+
     Serial.print("getResetReason: ");
     Serial.println(ESP.getResetReason());
 
     Serial.print("getResetInfo: ");
     Serial.println(ESP.getResetInfo());
+
+    Serial.print("macAddress: ");
+    Serial.println(WiFi.macAddress());
+
+    Serial.print("RSSI: ");
+    Serial.println(WiFi.RSSI());
+
+    Serial.print("channel: ");
+    Serial.println(WiFi.channel());
+//
+//    Serial.print("magicFlashChipSize: ");
+//    Serial.println(ESP.magicFlashChipSize());
+//
+//    Serial.print("magicFlashChipSpeed: ");
+//    Serial.println(ESP.magicFlashChipSpeed());
+//
+//    Serial.print("magicFlashChipMode: ");
+//    Serial.println(ESP.magicFlashChipMode());
+
+    Serial.print("getSketchSize: ");
+    Serial.println(ESP.getSketchSize());
+
+    Serial.print("getFreeSketchSpace: ");
+    Serial.println(ESP.getFreeSketchSpace());
   }
   
   if (WiFi.status() != WL_CONNECTED) {
@@ -215,4 +297,5 @@ void loop(void){
   counter++;
 
 }
+
 
