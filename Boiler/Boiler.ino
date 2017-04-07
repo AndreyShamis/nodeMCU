@@ -37,6 +37,7 @@ DallasTemperature   sensor(&oneWire);
 ESP8266WebServer    server(80);
 DeviceAddress       insideThermometer; // arrays to hold device address
 
+
 BoilerModeType boilerMode = UNDEF;
 //enum ADCMode {
 //    ADC_TOUT = 33,
@@ -45,22 +46,32 @@ BoilerModeType boilerMode = UNDEF;
 //    ADC_VDD = 255
 //};
 ADC_MODE(ADC_VCC);
+String  getAddressString(DeviceAddress deviceAddress);
+void    disableBoiler();
+void    enableBoiler();
+float   getTemperature();
+String  printTemperatureToSerial();
+String  read_setting(const char* fname);
+void    save_setting(const char* fname, String value);
 
-float getTemperature() {
-  sensor.requestTemperatures();
-  return sensor.getTempC(insideThermometer);
+String build_device_info(){
+    String ret = "<pre>Boiler MODE: " + String(boilerMode) + "\t\t\t Boiler status: " + String(boilerStatus);
+    ret += "\ngetFlashChipId: " + String(ESP.getFlashChipId()) + "\t\t getFlashChipSize: " + String(ESP.getFlashChipSize());
+    ret += "\ngetFlashChipSpeed: " + String(ESP.getFlashChipSpeed()) + "\t getFlashChipMode: " + String(ESP.getFlashChipMode());
+    ret += "\ngetSdkVersion: " + String(ESP.getSdkVersion()) + "\t getCoreVersion: " + ESP.getCoreVersion() + "\t\t getBootVersion: " + ESP.getBootVersion();
+    ret += "\ngetBootMode: " + String(ESP.getBootMode());
+    ret += "\ngetCpuFreqMHz: " + String(ESP.getCpuFreqMHz());
+    ret += "\nmacAddress: " + WiFi.macAddress() + "\t Channel : " + String(WiFi.channel()) + "\t\t\t RSSI: " + WiFi.RSSI();
+    ret += "\ngetSketchSize: " + String(ESP.getSketchSize()) + "\t\t getFreeSketchSpace: " + String(ESP.getFreeSketchSpace());
+    ret += "\ngetResetReason: " + ESP.getResetReason();
+    ret += "\ngetResetInfo: " + ESP.getResetInfo();
+    ret += "\nAddress : " + getAddressString(insideThermometer) + "</pre>";
+    return ret;
 }
-
-String printTemperatureToSerial(){
-  float tempC       = getTemperature();
-  Serial.print("INFO: Temperature C: ");
-  Serial.println(tempC);
-  return String(tempC);
-}
-
 void handleRoot() {
   String tmp = printTemperatureToSerial();
-  String message = "<h1> Temperature : " + tmp + "</h1>" + 
+  String message = build_device_info() + "<h1> Temperature : " + tmp + "</h1>" + 
+  "<form action='/'><input style='font-size:82px' type='submit' value='Refresh'></form>" +
   "<form action='/eb'><input style='font-size:82px' type='submit' value='Enable Load'></form>" +
   "<form action='/db'><input style='font-size:82px' type='submit' value='Disable Load'></form>" +
   "<form method='POST' action='/save_boilermode'><input type='text' value='" + String(boilerMode)  + "' /><input style='font-size:82px' type='submit' value='Save Boiler mode'></form>";
@@ -69,25 +80,6 @@ void handleRoot() {
   }
   message += server.client();
   server.send(200, "text/html", message);
-}
-
-void enableBoiler(){
-  float current_temp = getTemperature();
-  if(current_temp > MAX_POSSIBLE_TMP){
-    Serial.println("ERROR: Current temperature is bigger of possible maximum. " + String(current_temp) + ">" + String(MAX_POSSIBLE_TMP));
-  }
-  else{
-    boilerStatus = 1;
-    digitalWrite(BOILER_VCC, 1);
-  }
-}
-
-/**
- * Disable Boiler
- */
-void disableBoiler(){
-  boilerStatus = 0;
-  digitalWrite(BOILER_VCC, 0);
 }
 
 /***
@@ -119,39 +111,6 @@ void handleNotFound(){
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
-}
-
-/**
- * 
- */
-void save_setting(const char* fname,String value){
-  File f = SPIFFS.open(fname, "w");
-  if (!f){
-    Serial.print("Cannot open file:");
-    Serial.println(fname);
-    return;
-  }
-  f.println(value);
-  Serial.print("Writed:" );
-  Serial.println(value);
-  f.close();
-}
-
-/**
- * 
- */
-String read_setting(const char* fname){
-  String s      = "";
-  File f = SPIFFS.open(fname , "r");
-  if (!f){
-    Serial.print("file open failed:");
-    Serial.println(fname);
-  }
-  else{
-    s = f.readStringUntil('\n');
-    f.close();
-  }
-  return s;
 }
 
 /**
@@ -195,14 +154,19 @@ void setup(void){
   Serial.print(sensor.getDeviceCount(), DEC);
   Serial.println(" devices.");
   Serial.print("Parasite power is: ");
-  if (sensor.isParasitePowerMode())
+  if (sensor.isParasitePowerMode()){
     Serial.println("ON");
-  else
+  }
+  else{
     Serial.println("OFF");
-  if (!sensor.getAddress(insideThermometer, 0)) Serial.println("Unable to find address for Device 0");
+  }
+    
+  if (!sensor.getAddress(insideThermometer, 0)) {
+    Serial.println("Unable to find address for Device 0");
+  }
 
   // set the resolution to 9 bit (Each Dallas/Maxim device is capable of several different resolutions)
-  sensor.setResolution(insideThermometer, 9);
+  sensor.setResolution(insideThermometer, 12);
   server.on("/", handleRoot);
   server.on("/inline", [](){
     server.send(200, "text/plain", "this works as well");
@@ -263,11 +227,13 @@ void loop(void){
     Serial.println("getSketchSize: " + String(ESP.getSketchSize()) + "\t\t getFreeSketchSpace: " + String(ESP.getFreeSketchSpace()));
     Serial.println("getResetReason: " + ESP.getResetReason());
     Serial.println("getResetInfo: " + ESP.getResetInfo());
+    Serial.print("Address : " + getAddressString(insideThermometer));
 //    Serial.print("magicFlashChipSize: " + String(ESP.magicFlashChipSize()));
 //    Serial.print("magicFlashChipSpeed: " + String(ESP.magicFlashChipSpeed()));
 //    Serial.print("magicFlashChipMode: " + String(ESP.magicFlashChipMode()));
 
   }
+
   
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WIFI DISCONNECTED");
@@ -279,4 +245,95 @@ void loop(void){
 
 }
 
+/**
+ * 
+ */
+String getAddressString(DeviceAddress deviceAddress){
+  String ret = "";
+  for (uint8_t i = 0; i < 8; i++){
+    if (deviceAddress[i] < 16) {
+      ret += "0";
+    }
+    ret += String(deviceAddress[i], HEX);
+    if(i<7){
+      ret += ":";
+    }
+  }
+  return ret;
+}
+
+/**
+ * Enable boiler
+ */
+void enableBoiler(){
+  float current_temp = getTemperature();
+  if(current_temp > MAX_POSSIBLE_TMP){
+    Serial.println("ERROR: Current temperature is bigger of possible maximum. " + String(current_temp) + ">" + String(MAX_POSSIBLE_TMP));
+  }
+  else{
+    boilerStatus = 1;
+    digitalWrite(BOILER_VCC, 1);
+  }
+}
+
+/**
+ * Disable Boiler
+ */
+void disableBoiler(){
+  boilerStatus = 0;
+  digitalWrite(BOILER_VCC, 0);
+}
+
+
+/**
+ * Get Temperature
+ */
+float getTemperature() {
+  sensor.requestTemperatures();
+  return sensor.getTempC(insideThermometer);
+}
+
+/**
+ * Get end print temperature to serial
+ */
+String printTemperatureToSerial(){
+  float tempC       = getTemperature();
+  Serial.print("INFO: Temperature C: ");
+  Serial.println(tempC);
+  return String(tempC);
+}
+
+
+/**
+ * 
+ */
+void save_setting(const char* fname,String value){
+  File f = SPIFFS.open(fname, "w");
+  if (!f){
+    Serial.print("Cannot open file:");
+    Serial.println(fname);
+    return;
+  }
+  f.println(value);
+  Serial.print("Writed:" );
+  Serial.println(value);
+  f.close();
+}
+
+/**
+ * 
+ */
+String read_setting(const char* fname){
+  String s      = "";
+  File f = SPIFFS.open(fname , "r");
+  if (!f){
+    Serial.print("file open failed:");
+    Serial.println(fname);
+  }
+  else{
+    s = f.readStringUntil('\n');
+    f.close();
+  }
+  return s;
+}
 
