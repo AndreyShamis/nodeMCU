@@ -31,14 +31,16 @@ const char* password  = "polkalol";
 const int sleepTimeS  = 10;  // Time to sleep (in seconds):
 int counter           = 0;
 bool boilerStatus     = 0;
-float MAX_POSSIBLE_TMP = 40;
+float MAX_POSSIBLE_TMP = 65;
+bool secure_disabled  = false;
+float temperatureKeep = 40;
 OneWire             oneWire(ONE_WIRE_BUS);
 DallasTemperature   sensor(&oneWire);
 ESP8266WebServer    server(80);
 DeviceAddress       insideThermometer; // arrays to hold device address
 
 
-BoilerModeType boilerMode = UNDEF;
+BoilerModeType boilerMode = MANUAL;
 //enum ADCMode {
 //    ADC_TOUT = 33,
 //    ADC_TOUT_3V3 = 33,
@@ -54,6 +56,41 @@ String  printTemperatureToSerial();
 String  read_setting(const char* fname);
 void    save_setting(const char* fname, String value);
 
+String build_index(){
+  String ret = String("") + "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>Boiler Info</title></head><script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js'></script>\n" +
+  "<body>\n" +
+  "<style>.bg_green{background:palegreen} .bg_red{background:tomato} body{background:lightblue}</style>\n" +
+  "<table style='width: 100%;'><thead><tr><th>Controll</th><th>Info</th></tr></thead><tbody><tr><td><table>\n" +
+  "<tr class='temperature'><td>Current Temp</td><td><h2>" + printTemperatureToSerial() + "C [Max possible temperature " + String(MAX_POSSIBLE_TMP) + "]</h2></td></tr>\n" +
+  "<tr><td>Refresh</td><td><form action='/'><input style='font-size:82px' type='submit' value='Refresh'></form></td></tr>\n" +
+  "<tr id='enableBoiler'><td>Enable Boiler</td><td><form action='/eb'><input style='font-size:72px' type='submit' value='Enable Boiler'></form></td></tr>\n" +
+  "<tr id='disableBoiler'><td>Disable Boiler</td><td><form action='/db'><input style='font-size:72px' type='submit' value='Disable Boiler'></form></td></tr>\n" +
+  "<tr id='keepMode'><td>Keep</td><td><form action='/keep'>\n" +
+  "<input style='font-size:22px' type='number' value='"+ String((int)temperatureKeep) + "' name='temperatureKeep' maxlength='2'>\n" +
+  "<input style='font-size:62px' type='submit' value='Keep'></form></td></tr>\n" +
+  "</table></td><td><table>\n" +
+  "<tr><td>Boiler MODE</td><td>" + String(boilerMode) + " [Keep TMP=" + String(temperatureKeep) + " C]</td></tr>\n" +
+  "<tr><td>Boiler status</td><td><div class='boilerStatus'>" + String(boilerStatus) + "</div></td></tr>\n" +
+  "<tr><td>Disabled by watch</td><td><div class='disabledByWatchDog'>" + String(secure_disabled) + "</div></td></tr>\n" +
+  "<tr><td>FlashChipId</td><td>" + String(ESP.getFlashChipId()) + "</td></tr>\n" +
+  "<tr><td>FlashChipSize</td><td>" + String(ESP.getFlashChipSize()) + "</td></tr>\n" +
+  "<tr><td>FlashChipSpeed</td><td>" + String(ESP.getFlashChipSpeed()) + "</td></tr>\n" +
+  "<tr><td>FlashChipMode</td><td>" + String(ESP.getFlashChipMode()) + "</td></tr>\n" +
+  "<tr><td>CoreVersion/SdkVersion</td><td>" + ESP.getCoreVersion() + " / " + String(ESP.getSdkVersion()) + "</td></tr>\n" +
+  "<tr><td>BootVersion/BootMode</td><td>" + ESP.getBootVersion() + " / " + String(ESP.getBootMode()) + "</td></tr>\n" +
+  "<tr><td>CpuFreqMHz</td><td>" + String(ESP.getCpuFreqMHz()) + "</td></tr>\n" +
+  "<tr><td>macAddress</td><td>" + WiFi.macAddress() + "</td></tr>\n" +
+  "<tr><td>Channel/RSSI</td><td>" + String(WiFi.channel()) + " / " + WiFi.RSSI() + " dbm</td></tr>\n" +
+  "<tr><td>SketchSize/FreeSketchSpace</td><td>" + String(ESP.getSketchSize()) + " / " + String(ESP.getFreeSketchSpace()) + "</td></tr>\n" +
+  "<tr><td>Dallas Address</td><td>" + getAddressString(insideThermometer) + "</td></tr>\n" +
+  "</table></td></tr></tbody></table>\n" +
+  "<script>\n " + 
+  "$(document).ready(function(){ setTimeout('window.open(\"/\", \"_self\");', 180000); obj = $('.boilerStatus');\n temp = $('.temperature');\n" +
+  "if (obj.text() == '0') {\n $('#disableBoiler').remove(); \n obj.toggleClass('bg_green'); \n temp.toggleClass('bg_green'); \nobj.text('Off');} " +
+  "else {$('#enableBoiler').remove();obj.toggleClass('bg_red');temp.toggleClass('bg_red');obj.text('On')}});</script>\n" +
+  "</body></html>";
+  return ret;
+}
 String build_device_info(){
     String ret = "<pre>Boiler MODE: " + String(boilerMode) + "\t\t\t Boiler status: " + String(boilerStatus);
     ret += "\ngetFlashChipId: " + String(ESP.getFlashChipId()) + "\t\t getFlashChipSize: " + String(ESP.getFlashChipSize());
@@ -69,16 +106,12 @@ String build_device_info(){
     return ret;
 }
 void handleRoot() {
-  String tmp = printTemperatureToSerial();
-  String message = build_device_info() + "<h1> Temperature : " + tmp + "</h1>" + 
-  "<form action='/'><input style='font-size:82px' type='submit' value='Refresh'></form>" +
-  "<form action='/eb'><input style='font-size:82px' type='submit' value='Enable Load'></form>" +
-  "<form action='/db'><input style='font-size:82px' type='submit' value='Disable Load'></form>" +
-  "<form method='POST' action='/save_boilermode'><input type='text' value='" + String(boilerMode)  + "' /><input style='font-size:82px' type='submit' value='Save Boiler mode'></form>";
-  for (uint8_t i=0; i<server.args(); i++){
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  }
-  message += server.client();
+
+//  for (uint8_t i=0; i<server.args(); i++){
+//    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+//  }
+//  message += server.client();
+  String message = build_index();
   server.send(200, "text/html", message);
 }
 
@@ -93,9 +126,16 @@ void saveBoilerMode(){
   message += server.args() + "\n";
   for (uint8_t i=0; i<server.args(); i++){
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+    if (server.argName(i) == "temperatureKeep"){
+        temperatureKeep = server.arg(i).toFloat();
+        boilerMode = KEEP;
+        Serial.println("Keep temperature " + String(temperatureKeep));
+        if(temperatureKeep > MAX_POSSIBLE_TMP){
+          temperatureKeep = MAX_POSSIBLE_TMP;
+          Serial.println("Override Keep temperature " + String(temperatureKeep));
+        }
+    }
   }
-  server.send(200, "text/plain", message);
-  
 }
 
 /**
@@ -166,23 +206,26 @@ void setup(void){
   }
 
   // set the resolution to 9 bit (Each Dallas/Maxim device is capable of several different resolutions)
-  sensor.setResolution(insideThermometer, 12);
+  sensor.setResolution(insideThermometer, 9);
   server.on("/", handleRoot);
   server.on("/inline", [](){
     server.send(200, "text/plain", "this works as well");
   });
   server.on("/eb", [](){
     enableBoiler();
+    boilerMode = MANUAL;
     handleRoot();
   });
   server.on("/db", [](){
     disableBoiler();
+    boilerMode = MANUAL;
     handleRoot();
   });
-  server.on("/save_boilermode", [](){
+  server.on("/keep", [](){
     saveBoilerMode();
     handleRoot();
   });
+
   server.onNotFound(handleNotFound);
   Serial.println("INFO: Staring HTTP server...");
   server.begin();
@@ -204,13 +247,29 @@ void loop(void){
   server.handleClient();
   if(boilerStatus){
     float current_temp = getTemperature();
-    if(current_temp > MAX_POSSIBLE_TMP){
+    if(current_temp > MAX_POSSIBLE_TMP || (boilerMode == KEEP && current_temp > temperatureKeep)){
       Serial.println("WARNING: Current temperature is bigger of possible maximum. " + String(current_temp) + ">" + String(MAX_POSSIBLE_TMP));
       Serial.println("WARNING: Disabling Load");
       disableBoiler();
+      secure_disabled = true;
     }  
   }
-  
+  if (counter == 100){
+     float current_temp = getTemperature();
+    if(current_temp < 1){
+      Serial.println("WARNING: Very LOW temperatute. " + String(current_temp));
+      Serial.println("WARNING: Disabling Load");
+      disableBoiler();
+      secure_disabled = true;
+    }  
+  }
+  if(boilerMode == KEEP && !boilerStatus){
+    float current_temp = getTemperature();
+    if(current_temp < temperatureKeep &&  current_temp < MAX_POSSIBLE_TMP){
+      Serial.println("WARNING: Keep enabled, enable boiler");
+      enableBoiler();
+    } 
+  }
   if(counter > 1000){
     counter = 0;
     printTemperatureToSerial();
@@ -271,6 +330,7 @@ void enableBoiler(){
     Serial.println("ERROR: Current temperature is bigger of possible maximum. " + String(current_temp) + ">" + String(MAX_POSSIBLE_TMP));
   }
   else{
+    secure_disabled = false;
     boilerStatus = 1;
     digitalWrite(BOILER_VCC, 1);
   }
