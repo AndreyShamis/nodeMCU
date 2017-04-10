@@ -57,7 +57,10 @@ String  read_setting(const char* fname);
 void    save_setting(const char* fname, String value);
 
 String build_index(){
-  String ret = String("") + "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>Boiler Info</title></head><script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js'></script>\n" +
+  String ret = String("") + "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>Boiler Info</title></head>" +
+  " <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js'></script>\n" +
+  " <script src='http://tm.hldns.ru/js/boiler.js'></script>\n" +
+  " <link rel='stylesheet' type='text/css' href='http://tm.hldns.ru/css/boiler.css'>\n" +
   "<body>\n" +
   "<style>.bg_green{background:palegreen} .bg_red{background:tomato} body{background:lightblue}</style>\n" +
   "<table style='width: 100%;'><thead><tr><th>Controll</th><th>Info</th></tr></thead><tbody><tr><td><table>\n" +
@@ -85,9 +88,7 @@ String build_index(){
   "<tr><td>Dallas Address</td><td>" + getAddressString(insideThermometer) + "</td></tr>\n" +
   "</table></td></tr></tbody></table>\n" +
   "<script>\n " + 
-  "$(document).ready(function(){ setTimeout('window.open(\"/\", \"_self\");', 180000); obj = $('.boilerStatus');\n temp = $('.temperature');\n" +
-  "if (obj.text() == '0') {\n $('#disableBoiler').remove(); \n obj.toggleClass('bg_green'); \n temp.toggleClass('bg_green'); \nobj.text('Off');} " +
-  "else {$('#enableBoiler').remove();obj.toggleClass('bg_red');temp.toggleClass('bg_red');obj.text('On')}});</script>\n" +
+  "$(document).ready(function(){ onBoilerPageLoad(); });</script>\n" +
   "</body></html>";
   return ret;
 }
