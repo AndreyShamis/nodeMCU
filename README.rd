@@ -1,4 +1,5 @@
-Set time from serial TZ_adjust=-8; echo T$(($(date +%s)+60*60*$TZ_adjust)) > /dev/ttyUSB0
+Set time from serial 
+    TZ_adjust=-8; echo T$(($(date +%s)+60*60*$TZ_adjust)) > /dev/ttyUSB0
 
 
 sudo apt-get install make unrar autoconf automake libtool gcc g++ gperf flex bison texinfo gawk ncurses-dev libexpat-dev python python-serial sed git unzip bash help2man wget bzip2
