@@ -327,7 +327,7 @@ void loop(void) {
     Serial.println("getSketchSize: " + String(ESP.getSketchSize()) + "\t\t getFreeSketchSpace: " + String(ESP.getFreeSketchSpace()));
     //Serial.println("getResetReason: " + ESP.getResetReason());
     //Serial.println("getResetInfo: " + ESP.getResetInfo());
-    Serial.print("Address : " + getAddressString(insideThermometer));
+    Serial.println("Address : " + getAddressString(insideThermometer));
   }
 
   if (WiFi.status() != WL_CONNECTED) {
