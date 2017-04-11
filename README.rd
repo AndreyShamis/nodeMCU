@@ -1,4 +1,7 @@
 
+sudo apt-get install make unrar autoconf automake libtool gcc g++ gperf flex bison texinfo gawk ncurses-dev libexpat-dev python python-serial sed git unzip bash help2man wget bzip2
+sudo apt-get -y install libtool-bin
+
 Unzip 
 OneWire.zip             to ...../arduino/libraries/OneWire
 LedMatrix.zip           to ...../arduino/libraries/LedMatrix

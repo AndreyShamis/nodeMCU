@@ -40,6 +40,7 @@ bool        boilerStatus      = 0;
 float       MAX_POSSIBLE_TMP  = 65;
 bool        secure_disabled   = false;
 float       temperatureKeep   = 40;
+float       current_temp      = -10;
 OneWire             oneWire(ONE_WIRE_BUS);
 DallasTemperature   sensor(&oneWire);
 ESP8266WebServer    server(80);
@@ -81,7 +82,8 @@ String build_index(){
   "<input style='font-size:22px' type='number' value='"+ String((int)temperatureKeep) + "' name='temperatureKeep' maxlength='2'>\n" +
   "<input style='font-size:62px' type='submit' value='Keep'></form></td></tr>\n" +
   "</table></td><td><table>\n" +
-  "<tr><td>Boiler MODE</td><td>" + String(boilerMode) + " [Keep TMP=" + String(temperatureKeep) + " C]</td></tr>\n" +
+  "<tr><td>Boiler MODE</td><td><div clas='boilerMode'>" + String(boilerMode) + "</div></td></tr>\n" +
+  "<tr><td>Boiler MODE Desc</td><td><div clas='boilerModeDesc'>Keep TMP=" + String(temperatureKeep) + " C </div></td></tr>\n" +
   "<tr><td>Boiler status</td><td><div class='boilerStatus'>" + String(boilerStatus) + "</div></td></tr>\n" +
   "<tr><td>Disabled by watch</td><td><div class='disabledByWatchDog'>" + String(secure_disabled) + "</div></td></tr>\n" +
   "<tr><td>FlashChipId</td><td>" + String(ESP.getFlashChipId()) + "</td></tr>\n" +
@@ -92,6 +94,7 @@ String build_index(){
   "<tr><td>BootVersion/BootMode</td><td>" + ESP.getBootVersion() + " / " + String(ESP.getBootMode()) + "</td></tr>\n" +
   "<tr><td>CpuFreqMHz</td><td>" + String(ESP.getCpuFreqMHz()) + "</td></tr>\n" +
   "<tr><td>macAddress</td><td>" + WiFi.macAddress() + "</td></tr>\n" +
+  "<tr><td>HostName</td><td>" + WiFi.hostname() + "</td></tr>\n" +
   "<tr><td>Channel/RSSI</td><td>" + String(WiFi.channel()) + " / " + WiFi.RSSI() + " dbm</td></tr>\n" +
   "<tr><td>SketchSize/FreeSketchSpace</td><td>" + String(ESP.getSketchSize()) + " / " + String(ESP.getFreeSketchSpace()) + "</td></tr>\n" +
   "<tr><td>Dallas Address</td><td>" + getAddressString(insideThermometer) + "</td></tr>\n" +
@@ -221,7 +224,7 @@ void setup(void){
   }
 
   // set the resolution to 9 bit (Each Dallas/Maxim device is capable of several different resolutions)
-  sensor.setResolution(insideThermometer, 12);
+  sensor.setResolution(insideThermometer, 11);
   server.on("/", handleRoot);
   server.on("/inline", [](){
     server.send(200, "text/plain", "this works as well");
@@ -260,31 +263,31 @@ void setup(void){
 void loop(void){
   
   server.handleClient();
+  if(counter%50==0){
+    current_temp = getTemperature();
+  }
+  if(boilerMode == KEEP && !boilerStatus){
+    if(current_temp < temperatureKeep &&  current_temp < MAX_POSSIBLE_TMP && current_temp > 0){
+      Serial.println("WARNING: Keep enabled, enable boiler");
+      enableBoiler();
+    } 
+  }
   if(boilerStatus){
-    float current_temp = getTemperature();
     if(current_temp > MAX_POSSIBLE_TMP || (boilerMode == KEEP && current_temp > temperatureKeep)){
       Serial.println("WARNING: Current temperature is bigger of possible maximum. " + String(current_temp) + ">" + String(MAX_POSSIBLE_TMP));
       Serial.println("WARNING: Disabling Load");
       disableBoiler();
       secure_disabled = true;
-    }  
+    }
   }
-  if (counter == 100){
-     float current_temp = getTemperature();
-    if(current_temp < 1){
-      Serial.println("WARNING: Very LOW temperatute. " + String(current_temp));
-      Serial.println("WARNING: Disabling Load");
-      disableBoiler();
-      secure_disabled = true;
-    }  
+  
+  if(current_temp < 1){
+    Serial.println("WARNING: Very LOW temperatute. " + String(current_temp));
+    Serial.println("WARNING: Disabling Load");
+    disableBoiler();
+    secure_disabled = true;
   }
-  if(boilerMode == KEEP && !boilerStatus){
-    float current_temp = getTemperature();
-    if(current_temp < temperatureKeep &&  current_temp < MAX_POSSIBLE_TMP){
-      Serial.println("WARNING: Keep enabled, enable boiler");
-      enableBoiler();
-    } 
-  }
+    
   if(counter > 1000){
     #ifdef __LED_MATRIX
       ledMatrix.setNextText(String(getTemperature()) + " C");
@@ -300,17 +303,12 @@ void loop(void){
     Serial.println("getSdkVersion: " + String(ESP.getSdkVersion()) + "\t getCoreVersion: " + ESP.getCoreVersion() + "\t\t getBootVersion: " + ESP.getBootVersion());
     Serial.println("getBootMode: " + String(ESP.getBootMode()));
     Serial.println("getCpuFreqMHz: " + String(ESP.getCpuFreqMHz()));
-    Serial.println("macAddress: " + WiFi.macAddress() + "\t Channel : " + String(WiFi.channel()) + "\t\t\t RSSI: " + WiFi.RSSI());
+    Serial.println("HostName :" + WiFi.hostname() + "\tmacAddress: " + WiFi.macAddress() + "\t Channel : " + String(WiFi.channel()) + "\t\t\t RSSI: " + WiFi.RSSI());
     Serial.println("getSketchSize: " + String(ESP.getSketchSize()) + "\t\t getFreeSketchSpace: " + String(ESP.getFreeSketchSpace()));
     Serial.println("getResetReason: " + ESP.getResetReason());
     Serial.println("getResetInfo: " + ESP.getResetInfo());
     Serial.print("Address : " + getAddressString(insideThermometer));
-//    Serial.print("magicFlashChipSize: " + String(ESP.magicFlashChipSize()));
-//    Serial.print("magicFlashChipSpeed: " + String(ESP.magicFlashChipSpeed()));
-//    Serial.print("magicFlashChipMode: " + String(ESP.magicFlashChipMode()));
-
   }
-
   
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WIFI DISCONNECTED");
@@ -381,10 +379,10 @@ float getTemperature() {
  * Get end print temperature to serial
  */
 String printTemperatureToSerial(){
-  float tempC       = getTemperature();
+  current_temp       = getTemperature();
   Serial.print("INFO: Temperature C: ");
-  Serial.println(tempC);
-  return String(tempC);
+  Serial.println(current_temp);
+  return String(current_temp);
 }
 
 
