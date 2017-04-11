@@ -32,7 +32,7 @@ typedef enum {
 
 #define               ONE_WIRE_BUS  D4 //D4 2
 #define               BOILER_VCC    D7 //D7 13
-#define               NUMBER_OF_DEVICES 4
+#define               NUMBER_OF_DEVICES 1
 #define               CS_PIN        D1
 #define TIME_MSG_LEN 11 // time sync to PC is HEADER followed by Unix time_t as ten ASCII digits
 #define TIME_HEADER 'T' // Header tag for serial time sync message
@@ -195,7 +195,7 @@ void setup(void) {
   Serial.println("PASS: Serial communication started.");
 #ifdef __LED_MATRIX
   ledMatrix.init();
-  ledMatrix.setTextAlignment(TEXT_ALIGN_RIGHT);
+  //ledMatrix.setTextAlignment(TEXT_ALIGN_RIGHT);
   ledMatrix.setIntensity(3); // range is 0-15
   ledMatrix.setText(" AnDrEy ");
 #endif
@@ -325,8 +325,8 @@ void loop(void) {
     Serial.println("getCpuFreqMHz: " + String(ESP.getCpuFreqMHz()));
     Serial.println("HostName :" + WiFi.hostname() + "\tmacAddress: " + WiFi.macAddress() + "\t Channel : " + String(WiFi.channel()) + "\t\t\t RSSI: " + WiFi.RSSI());
     Serial.println("getSketchSize: " + String(ESP.getSketchSize()) + "\t\t getFreeSketchSpace: " + String(ESP.getFreeSketchSpace()));
-    Serial.println("getResetReason: " + ESP.getResetReason());
-    Serial.println("getResetInfo: " + ESP.getResetInfo());
+    //Serial.println("getResetReason: " + ESP.getResetReason());
+    //Serial.println("getResetInfo: " + ESP.getResetInfo());
     Serial.print("Address : " + getAddressString(insideThermometer));
   }
 
