@@ -43,7 +43,7 @@ const char  *password         = "polkalol";
 const int   sleepTimeS        = 10;  // Time to sleep (in seconds):
 int         counter           = 0;
 bool        boilerStatus      = 0;
-float       MAX_POSSIBLE_TMP  = 65;
+float       MAX_POSSIBLE_TMP  = 70;
 bool        secure_disabled   = false;
 float       temperatureKeep   = 40;
 float       current_temp      = -10;
@@ -87,6 +87,7 @@ String build_index() {
                "<body>\n" +
                "<style>.bg_green{background:palegreen} .bg_red{background:tomato} body{background:lightblue}</style>\n" +
                "<table style='width: 100%;'><thead><tr><th>Controll</th><th>Info</th></tr></thead><tbody><tr><td><table>\n" +
+               "<tr><td>Time</td><td><div class='time'>" + timeClient.getFormattedTime() + "</div><div class='timeEpoch'>" + timeClient.getEpochTime() + "</div></td></tr>\n" +
                "<tr class='temperature'><td>Current Temp</td><td><h2>" + printTemperatureToSerial() + "C [Max possible temperature " + String(MAX_POSSIBLE_TMP) + "]</h2></td></tr>\n" +
                "<tr><td>Refresh</td><td><form action='/'><input style='font-size:82px' type='submit' value='Refresh'></form></td></tr>\n" +
                "<tr id='enableBoiler'><td>Enable Boiler</td><td><form action='/eb'><input style='font-size:72px' type='submit' value='Enable Boiler'></form></td></tr>\n" +
@@ -96,7 +97,7 @@ String build_index() {
                "<input style='font-size:62px' type='submit' value='Keep'></form></td></tr>\n" +
                "</table></td><td><table>\n" +
                "<tr><td>Boiler MODE</td><td><div clas='boilerMode'>" + String(boilerMode) + "</div></td></tr>\n" +
-               "<tr><td>Boiler MODE Desc</td><td><div clas='boilerModeDesc'>Keep TMP=" + String(temperatureKeep) + " C </div></td></tr>\n" +
+               "<tr class='boilerModeDescLine'><td>Boiler MODE Desc</td><td><div clas='boilerModeDesc'>Keep TMP=" + String(temperatureKeep) + " C </div></td></tr>\n" +
                "<tr><td>Boiler status</td><td><div class='boilerStatus'>" + String(boilerStatus) + "</div></td></tr>\n" +
                "<tr><td>Disabled by watch</td><td><div class='disabledByWatchDog'>" + String(secure_disabled) + "</div></td></tr>\n" +
                "<tr><td>FlashChipId</td><td>" + String(ESP.getFlashChipId()) + "</td></tr>\n" +
@@ -126,8 +127,8 @@ String build_device_info() {
   ret += "\ngetCpuFreqMHz: " + String(ESP.getCpuFreqMHz());
   ret += "\nmacAddress: " + WiFi.macAddress() + "\t Channel : " + String(WiFi.channel()) + "\t\t\t RSSI: " + WiFi.RSSI();
   ret += "\ngetSketchSize: " + String(ESP.getSketchSize()) + "\t\t getFreeSketchSpace: " + String(ESP.getFreeSketchSpace());
-  ret += "\ngetResetReason: " + ESP.getResetReason();
-  ret += "\ngetResetInfo: " + ESP.getResetInfo();
+  //ret += "\ngetResetReason: " + ESP.getResetReason();
+  //ret += "\ngetResetInfo: " + ESP.getResetInfo();
   ret += "\nAddress : " + getAddressString(insideThermometer) + "</pre>";
   return ret;
 }
@@ -356,9 +357,8 @@ void loop(void) {
       digitalClockDisplay();
     }
     
-
     Serial.println(timeClient.getFormattedTime());
-    Serial.println(timeClient.getEpochTime());
+    //Serial.println(timeClient.getEpochTime());
   }
 }
 ////////////////////////////////////////////////////////////////////////////
