@@ -7,6 +7,11 @@ extern "C" {
 #include "user_interface.h"
 #include "cont.h"
 }
+#define __LED_MATRIX
+#ifdef __LED_MATRIX
+  #include <LedMatrix.h>
+#endif
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -24,21 +29,25 @@ typedef enum{
 
 #define               ONE_WIRE_BUS  D4 //D4 2
 #define               BOILER_VCC    D7 //D7 13
+#define               NUMBER_OF_DEVICES 1
+#define               CS_PIN        D1
 
-//const int led         = D7; //13;
-const char* ssid      = "RadiationG";
-const char* password  = "polkalol";
-const int sleepTimeS  = 10;  // Time to sleep (in seconds):
-int counter           = 0;
-bool boilerStatus     = 0;
-float MAX_POSSIBLE_TMP = 65;
-bool secure_disabled  = false;
-float temperatureKeep = 40;
+const char  *ssid             = "RadiationG";
+const char  *password         = "polkalol";
+const int   sleepTimeS        = 10;  // Time to sleep (in seconds):
+int         counter           = 0;
+bool        boilerStatus      = 0;
+float       MAX_POSSIBLE_TMP  = 65;
+bool        secure_disabled   = false;
+float       temperatureKeep   = 40;
 OneWire             oneWire(ONE_WIRE_BUS);
 DallasTemperature   sensor(&oneWire);
 ESP8266WebServer    server(80);
 DeviceAddress       insideThermometer; // arrays to hold device address
 
+#ifdef __LED_MATRIX
+  LedMatrix ledMatrix = LedMatrix(NUMBER_OF_DEVICES, CS_PIN);
+#endif
 
 BoilerModeType boilerMode = MANUAL;
 //enum ADCMode {
@@ -165,6 +174,11 @@ void setup(void){
   Serial.begin(115200);
   Serial.println("");
   Serial.println("PASS: Serial communication started.");
+  #ifdef __LED_MATRIX
+    ledMatrix.init();
+    ledMatrix.setIntensity(3); // range is 0-15
+    ledMatrix.setText(" AnDrEy ");
+  #endif
   Serial.println("INFO: Starting SPIFFS...");
   SPIFFS.begin();
   Serial.println("PASS: SPIFFS startted.");
@@ -207,7 +221,7 @@ void setup(void){
   }
 
   // set the resolution to 9 bit (Each Dallas/Maxim device is capable of several different resolutions)
-  sensor.setResolution(insideThermometer, 9);
+  sensor.setResolution(insideThermometer, 12);
   server.on("/", handleRoot);
   server.on("/inline", [](){
     server.send(200, "text/plain", "this works as well");
@@ -236,7 +250,7 @@ void setup(void){
   Serial.println(read_setting("/ssid"));
   Serial.println(read_setting("/password"));
       // Sleep
-  Serial.println("ESP8266 in sleep mode");
+  //Serial.println("ESP8266 in sleep mode");
   //ESP.deepSleep(sleepTimeS * 1000000, RF_DEFAULT);
 }
 
@@ -272,6 +286,9 @@ void loop(void){
     } 
   }
   if(counter > 1000){
+    #ifdef __LED_MATRIX
+      ledMatrix.setNextText(String(getTemperature()) + " C");
+    #endif
     counter = 0;
     printTemperatureToSerial();
   }
@@ -299,6 +316,12 @@ void loop(void){
     Serial.println("WIFI DISCONNECTED");
     delay(500);
   }
+  #ifdef __LED_MATRIX
+    ledMatrix.clear();
+    ledMatrix.scrollTextLeft();
+    ledMatrix.drawText();
+    ledMatrix.commit(); // commit transfers the byte buffer to the displays
+  #endif
   //ESP.deepSleep(sleepTimeS * 1000000, RF_DEFAULT);
   delay(100);
   counter++;
@@ -397,4 +420,6 @@ String read_setting(const char* fname){
   }
   return s;
 }
+
+
 
