@@ -89,13 +89,37 @@ String  read_setting(const char* fname);
 void    save_setting(const char* fname, String value);
 
 String build_index() {
+  String ret_js = String("") + "boiler = {" +
+                  "'boiler_mode': '" + String(boilerMode) + "'," +
+                  "'boiler_status': '" + String(boilerStatus) + "'," +
+                  "'disbaled_by_watch': '" + String(secure_disabled) + "'," +
+                  "'max_temperature': '" + String(MAX_POSSIBLE_TMP) + "'," +
+                  "'keep_temperature': '" + String((int)temperatureKeep) + "'," +
+                  "'flash_chip_id': '" + String(ESP.getFlashChipId()) + "'," +
+                  "'flash_chip_size': '" + String(ESP.getFlashChipSize()) + "'," +
+                  "'flash_chip_speed': '" + String(ESP.getFlashChipSpeed()) + "'," +
+                  "'flash_chip_mode': '" + String(ESP.getFlashChipMode()) + "'," +
+                  "'core_version': '" + ESP.getCoreVersion() + "'," +
+                  "'sdk_version': '" + String(ESP.getSdkVersion()) + "'," +
+                  "'boot_version': '" + ESP.getBootVersion() + "'," +
+                  "'boot_mode': '" + String(ESP.getBootMode()) + "'," +
+                  "'cpu_freq': '" + String(ESP.getCpuFreqMHz()) + "'," +
+                  "'mac_addr': '" + WiFi.macAddress() + "'," +
+                  "'wifi_channel': '" + String(WiFi.channel()) + "'," +
+                  "'rssi': '" + WiFi.RSSI() + "'," +
+                  "'sketch_size': '" + String(ESP.getSketchSize()) + "'," +
+                  "'free_sketch_size': '" + String(ESP.getFreeSketchSpace()) + "'," +
+                  "'dallas_addr': '" + getAddressString(insideThermometer) + "'," +
+                  "'time_str': '" + timeClient.getFormattedTime() + "'," +
+                  "'time_epoch': '" + timeClient.getEpochTime() + "'," +
+                  "'hostname': '" + WiFi.hostname() + "'" +
+                  "};";
   String ret = String("") + "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>Boiler Info</title></head>" +
                " <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js'></script>\n" +
                " <script src='http://tm.hldns.ru/js/boiler.js'></script>\n" +
                " <link rel='stylesheet' type='text/css' href='http://tm.hldns.ru/css/boiler.css'>\n" +
-               "<body>\n" +
-               "<style>.bg_green{background:palegreen} .bg_red{background:tomato} body{background:lightblue}</style>\n" +
-               "<table style='width: 100%;'><thead><tr><th>Controll</th><th>Info</th></tr></thead><tbody><tr><td><table>\n" +
+               "<body><script>" + ret_js + "</script>\n" +
+               "<div id='content'><table style='width: 100%;'><thead><tr><th>Controll</th><th>Info</th></tr></thead><tbody><tr><td><table>\n" +
                "<tr><td>Time</td><td><div class='time'>" + timeClient.getFormattedTime() + "</div><div class='timeEpoch'>" + timeClient.getEpochTime() + "</div></td></tr>\n" +
                "<tr class='temperature'><td>Current Temp</td><td><h2>" + printTemperatureToSerial() + "C [Max possible temperature " + String(MAX_POSSIBLE_TMP) + "]</h2></td></tr>\n" +
                "<tr><td>Refresh</td><td><form action='/'><input style='font-size:82px' type='submit' value='Refresh'></form></td></tr>\n" +
@@ -121,7 +145,7 @@ String build_index() {
                "<tr><td>Channel/RSSI</td><td>" + String(WiFi.channel()) + " / " + WiFi.RSSI() + " dbm</td></tr>\n" +
                "<tr><td>SketchSize/FreeSketchSpace</td><td>" + String(ESP.getSketchSize()) + " / " + String(ESP.getFreeSketchSpace()) + "</td></tr>\n" +
                "<tr><td>Dallas Address</td><td>" + getAddressString(insideThermometer) + "</td></tr>\n" +
-               "</table></td></tr></tbody></table>\n" +
+               "</table></td></tr></tbody></table>\n</div>" +
                "<script>\n " +
                "$(document).ready(function(){ onBoilerPageLoad(); });</script>\n" +
                "</body></html>";
@@ -391,7 +415,7 @@ void loop(void) {
     //Serial.println(timeClient.getEpochTime());
 
   }
-  if (counter % 10 == 0) {
+  if (counter % 1 == 0) {
     /* Get a new sensor event */
     sensors_event_t event;
     accel.getEvent(&event);
@@ -400,6 +424,21 @@ void loop(void) {
     Serial.print("X: "); Serial.print(event.acceleration.x); Serial.print("  ");
     Serial.print("Y: "); Serial.print(event.acceleration.y); Serial.print("  ");
     Serial.print("Z: "); Serial.print(event.acceleration.z); Serial.print("  "); Serial.println("m/s^2 ");
+
+    //        /* Display the results (acceleration is measured in m/s^2) */
+    //    Serial.print("magnetic X: "); Serial.print(event.magnetic.x); Serial.print("  ");
+    //    Serial.print("Y: "); Serial.print(event.magnetic.y); Serial.print("  ");
+    //    Serial.print("Z: "); Serial.print(event.magnetic.z); Serial.print("  "); Serial.println("m/s^2 ");
+
+    /* Display the results (acceleration is measured in m/s^2) */
+    Serial.print("orientation ROLL: "); Serial.print(event.orientation.roll); Serial.print("  ");
+    Serial.print("PITCH: "); Serial.print(event.orientation.pitch); Serial.print("  ");
+    Serial.print("HEADING: "); Serial.print(event.orientation.heading); Serial.print("  "); Serial.println("");
+
+    //                /* Display the results (acceleration is measured in m/s^2) */
+    //    Serial.print("gyro X: "); Serial.print(event.gyro.x); Serial.print("  ");
+    //    Serial.print("Y: "); Serial.print(event.gyro.y); Serial.print("  ");
+    //    Serial.print("Z: "); Serial.print(event.gyro.z); Serial.print("  "); Serial.println("m/s^2 ");
   }
 }
 ////////////////////////////////////////////////////////////////////////////
