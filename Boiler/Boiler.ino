@@ -46,7 +46,7 @@ const char  *password         = "polkalol";
 const int   sleepTimeS        = 10;  // Time to sleep (in seconds):
 int         counter           = 0;
 bool        boilerStatus      = 0;
-float       MAX_POSSIBLE_TMP  = 70;
+float       MAX_POSSIBLE_TMP  = 65;
 bool        secure_disabled   = false;
 float       temperatureKeep   = 40;
 float       current_temp      = -10;
@@ -95,6 +95,7 @@ String build_index() {
                   "'disbaled_by_watch': '" + String(secure_disabled) + "'," +
                   "'max_temperature': '" + String(MAX_POSSIBLE_TMP) + "'," +
                   "'keep_temperature': '" + String((int)temperatureKeep) + "'," +
+                  "'current_temperature': '" + String(printTemperatureToSerial()) + "'," +
                   "'flash_chip_id': '" + String(ESP.getFlashChipId()) + "'," +
                   "'flash_chip_size': '" + String(ESP.getFlashChipSize()) + "'," +
                   "'flash_chip_speed': '" + String(ESP.getFlashChipSpeed()) + "'," +
@@ -119,35 +120,8 @@ String build_index() {
                " <script src='http://tm.hldns.ru/js/boiler.js'></script>\n" +
                " <link rel='stylesheet' type='text/css' href='http://tm.hldns.ru/css/boiler.css'>\n" +
                "<body><script>" + ret_js + "</script>\n" +
-               "<div id='content'><table style='width: 100%;'><thead><tr><th>Controll</th><th>Info</th></tr></thead><tbody><tr><td><table>\n" +
-               "<tr><td>Time</td><td><div class='time'>" + timeClient.getFormattedTime() + "</div><div class='timeEpoch'>" + timeClient.getEpochTime() + "</div></td></tr>\n" +
-               "<tr class='temperature'><td>Current Temp</td><td><h2>" + printTemperatureToSerial() + "C [Max possible temperature " + String(MAX_POSSIBLE_TMP) + "]</h2></td></tr>\n" +
-               "<tr><td>Refresh</td><td><form action='/'><input style='font-size:82px' type='submit' value='Refresh'></form></td></tr>\n" +
-               "<tr id='enableBoiler'><td>Enable Boiler</td><td><form action='/eb'><input style='font-size:72px' type='submit' value='Enable Boiler'></form></td></tr>\n" +
-               "<tr id='disableBoiler'><td>Disable Boiler</td><td><form action='/db'><input style='font-size:72px' type='submit' value='Disable Boiler'></form></td></tr>\n" +
-               "<tr id='keepMode'><td>Keep</td><td><form action='/keep'>\n" +
-               "<input style='font-size:22px' type='number' value='" + String((int)temperatureKeep) + "' name='temperatureKeep' maxlength='2'>\n" +
-               "<input style='font-size:62px' type='submit' value='Keep'></form></td></tr>\n" +
-               "</table></td><td><table>\n" +
-               "<tr><td>Boiler MODE</td><td><div clas='boilerMode'>" + String(boilerMode) + "</div></td></tr>\n" +
-               "<tr class='boilerModeDescLine'><td>Boiler MODE Desc</td><td><div clas='boilerModeDesc'>Keep TMP=" + String(temperatureKeep) + " C </div></td></tr>\n" +
-               "<tr><td>Boiler status</td><td><div class='boilerStatus'>" + String(boilerStatus) + "</div></td></tr>\n" +
-               "<tr><td>Disabled by watch</td><td><div class='disabledByWatchDog'>" + String(secure_disabled) + "</div></td></tr>\n" +
-               "<tr><td>FlashChipId</td><td>" + String(ESP.getFlashChipId()) + "</td></tr>\n" +
-               "<tr><td>FlashChipSize</td><td>" + String(ESP.getFlashChipSize()) + "</td></tr>\n" +
-               "<tr><td>FlashChipSpeed</td><td>" + String(ESP.getFlashChipSpeed()) + "</td></tr>\n" +
-               "<tr><td>FlashChipMode</td><td>" + String(ESP.getFlashChipMode()) + "</td></tr>\n" +
-               "<tr><td>CoreVersion/SdkVersion</td><td>" + ESP.getCoreVersion() + " / " + String(ESP.getSdkVersion()) + "</td></tr>\n" +
-               "<tr><td>BootVersion/BootMode</td><td>" + ESP.getBootVersion() + " / " + String(ESP.getBootMode()) + "</td></tr>\n" +
-               "<tr><td>CpuFreqMHz</td><td>" + String(ESP.getCpuFreqMHz()) + "</td></tr>\n" +
-               "<tr><td>macAddress</td><td>" + WiFi.macAddress() + "</td></tr>\n" +
-               "<tr><td>HostName</td><td>" + WiFi.hostname() + "</td></tr>\n" +
-               "<tr><td>Channel/RSSI</td><td>" + String(WiFi.channel()) + " / " + WiFi.RSSI() + " dbm</td></tr>\n" +
-               "<tr><td>SketchSize/FreeSketchSpace</td><td>" + String(ESP.getSketchSize()) + " / " + String(ESP.getFreeSketchSpace()) + "</td></tr>\n" +
-               "<tr><td>Dallas Address</td><td>" + getAddressString(insideThermometer) + "</td></tr>\n" +
-               "</table></td></tr></tbody></table>\n</div>" +
-               "<script>\n " +
-               "$(document).ready(function(){ onBoilerPageLoad(); });</script>\n" +
+               "<div id='content'></div>" +
+               "<script>\n " +               "$(document).ready(function(){ onBoilerPageLoad(); });</script>\n" +
                "</body></html>";
   return ret;
 }
