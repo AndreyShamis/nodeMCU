@@ -30,25 +30,44 @@
 int sensorPin = A0;    // select the input pin for the potentiometer
 int ledPin = D7;      // select the pin for the LED
 int sensorValue = 0;  // variable to store the value coming from the sensor
+#define ADC       A0  // select the input pin for the potentiometer
 
+#define X_CTRL    D1  
+#define Y_CTRL    D2  
+int X = 0;
+int Y = 0;
 void setup() {
   // declare the ledPin as an OUTPUT:
   pinMode(ledPin, OUTPUT);
+  // put your setup code here, to run once:
+  pinMode(X_CTRL, OUTPUT);
+  pinMode(Y_CTRL, OUTPUT);
+  digitalWrite(X_CTRL, LOW);
+  digitalWrite(Y_CTRL, LOW);
   Serial.begin(115200);
   Serial.println("");
   Serial.println("PASS: Serial communication started.");
 }
+void read_adc(){
 
+  // put your main code here, to run repeatedly:
+  digitalWrite(X_CTRL, HIGH);
+  delay(10);
+  //digitalWrite(Y_CTRL, LOW);
+  X = analogRead(ADC);
+  digitalWrite(X_CTRL, LOW);
+  delay(10);
+  digitalWrite(Y_CTRL, HIGH);
+  delay(10);
+  Y = analogRead(ADC);
+  digitalWrite(Y_CTRL, LOW);
+  delay(10);
+}
 void loop() {
-  // read the value from the sensor:
-  sensorValue = analogRead(sensorPin);
-  // turn the ledPin on
   digitalWrite(ledPin, HIGH);
-  Serial.println("INFO: sensor value " + String(sensorValue));
-  // stop the program for <sensorValue> milliseconds:
-  delay(sensorValue);
-  // turn the ledPin off:
+  read_adc();
+  Serial.println("INFO: sensor value X:" + String(X) + " Y:" + String(Y));
+  delay(50);
   digitalWrite(ledPin, LOW);
-  // stop the program for for <sensorValue> milliseconds:
-  delay(sensorValue);
+  delay(50);
 }
