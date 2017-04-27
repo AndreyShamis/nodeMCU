@@ -33,8 +33,8 @@ int ledPin = D7;      // select the pin for the LED
 int sensorValue = 0;  // variable to store the value coming from the sensor
 #define ADC       A0  // select the input pin for the potentiometer
 
-#define X_CTRL    D1  
-#define Y_CTRL    D2  
+#define X_CTRL    D0  
+#define Y_CTRL    D1  
 int X = 0;
 int Y = 0;
 void setup() {
@@ -49,6 +49,7 @@ void setup() {
   Serial.println("");
   Serial.println("PASS: Serial communication started.");
   calibrate();
+  Serial.println("PASS: Callibration finished.");
 }
 //void read_adc(){
 //
@@ -71,7 +72,7 @@ float  joystick_xmult = 1;
 int    joystick_ymax = 1023;
 float  joystick_ymult = 1;
 
-static void calibrate()
+ void calibrate()
 {
   int cnt = 0;
   int xmax = 0;
@@ -80,35 +81,60 @@ static void calibrate()
   int ymin = 1023;
   while(cnt < 4)
   {
-     int jx = joystick_xmax-get_joystick_x();
-     int jy = joystick_ymax-get_joystick_y();
-     if((cnt % 2 == 0) && jx < 450) 
+    delay(100);
+    Serial.println("CNT: " + String(cnt));
+    int x = get_joystick_x();
+    int y = get_joystick_y();
+     int jx = joystick_xmax-x;
+     int jy = joystick_ymax-y;
+     Serial.println("x: " + String(x));
+     Serial.println("y: " + String(y));
+     if((cnt == 0) && jx < 100) // 450
        cnt++;
-     if((cnt % 2 == 1) && jx > 800) 
+       xmax = MAX(xmax, jx);
+     if((cnt == 1) && jx > 300) //800
        cnt++;
-     xmax = MAX(xmax, jx);
-     xmin = MIN(xmin, jx);
-     ymax = MAX(ymax, jy);
-     ymin = MIN(ymin, jy);
+       xmin = MIN(xmin, jx);
+      if((cnt == 2) && jy > 300) //800
+       cnt++;
+       ymin = MIN(ymin, jy);
+     if((cnt == 3) && jy < 100) //800
+       cnt++;
+       ymax = MAX(ymax, jy);
+     
+     Serial.println("jx: " + String(jx));
+     Serial.println("jy: " + String(jy));
+     Serial.println("XMAX: " + String(xmax));
+     Serial.println("YMAX: " + String(ymax));
+     Serial.println("XMIN: " + String(xmin));
+     Serial.println("YMIN: " + String(ymin));
   }
   joystick_xmax = xmax;
   joystick_xmult = 1023.0/(xmax - xmin);
   joystick_ymax = ymax;
   joystick_ymult = 1023.0/(ymax - ymin);
 }
-static unsigned int get_joystick_x()
+ unsigned int get_joystick_x()
 {
   pinMode(X_CTRL,INPUT);
   pinMode(Y_CTRL,OUTPUT);
   digitalWrite(Y_CTRL,LOW);
-  return (unsigned int)MAX(0, MIN(1023,((joystick_xmax-analogRead(ADC))*joystick_xmult)));
+  unsigned int x= (unsigned int)MAX(0, MIN(1023,((joystick_xmax-analogRead(ADC))*joystick_xmult)));
+  if(x> 1023){
+    x = 0;
+  }
+  return x;  
 }
-static unsigned int get_joystick_y()
+ unsigned int get_joystick_y()
 {
   pinMode(Y_CTRL,INPUT);
   pinMode(X_CTRL,OUTPUT);
   digitalWrite(X_CTRL,LOW);
-  return (unsigned int)MAX(0, MIN(1023,((joystick_ymax-analogRead(ADC))*joystick_ymult)));
+  unsigned int y = (unsigned int)MAX(0, MIN(1023,((joystick_ymax-analogRead(ADC))*joystick_ymult)));
+  if(y> 1023){
+    y = 0;
+  }
+  return y;
 }
 void loop() {
   digitalWrite(ledPin, HIGH);
