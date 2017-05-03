@@ -1,0 +1,1683 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+				"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+				<html>
+				<head>
+					<title>Робот на NodeMCU ESP8266</title>
+					<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+					<meta name="yandex-verification" content="4810d7a06b7443d3" />
+					<meta name="keywords" content="" />
+					<meta name="description" content="Робот на NodeMCU ESP8266" />
+					<meta http-equiv="X-FRAME-OPTIONS" content="SAMEORIGIN" />
+					<meta property="fb:admins" content="100000072189793" />
+					<link rel="canonical" href="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666" />
+					<meta property="fb:app_id" content="586543721489673" />
+			
+				<meta name="twitter:card" content="summary_large_image" />
+				<meta name="twitter:site" content="@pikabu_vk" />
+				<meta name="twitter:title" content="Робот на NodeMCU ESP8266" />
+				<meta name="twitter:url" content="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666" />
+			
+					<meta name="twitter:description" content="И так поехали...Подключение до безумия простое - питание на nodeMCU подавать на контакт vin (там есть стабилизатор), про GND все и так ясно - минус он и в Африке земля))На nodeMCU заливаем скетч из ар" />
+				
+					<meta name="twitter:image:src" content="http://s8.pikabu.ru/post_img/2016/07/14/7/og_og_1468491969272876866.jpg" />
+				
+				<meta property="article:author" content="http://www.facebook.com/pikabu.ru">
+				<meta property="article:publisher" content="http://www.facebook.com/pikabu.ru">
+				<meta property="og:type" content="article" />
+				<meta property="og:title" content="Робот на NodeMCU ESP8266" />
+				<meta property="og:url" content="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666" />
+				<meta property="og:image" content="http://s8.pikabu.ru/post_img/2016/07/14/7/og_og_1468491969272876866.jpg" />
+				<meta property="og:site_name" content="Пикабу" />
+			
+					<meta property="og:description" content="И так поехали...Подключение до безумия простое - питание на nodeMCU подавать на контакт vin (там есть стабилизатор), про GND все и так ясно - минус он и в Африке земля))На nodeMCU заливаем скетч из ар Автор: ProstoBrat" />
+				
+				<link id="favicon" rel="shortcut icon" href="http://cs.pikabu.ru/favicon2x.ico" type="image/x-icon">
+				<link rel="apple-touch-icon" sizes="144x144" href="http://cs.pikabu.ru/images/icon_ios144.png" />
+				<link rel="apple-touch-icon" sizes="114x114" href="http://cs.pikabu.ru/images/icon_ios114.png" />
+			
+				<script type="text/javascript">
+					// define initial parameters
+					var initParams = {"siteURL":"http:\/\/pikabu.ru\/","imgURL":"http:\/\/cs.pikabu.ru","userID":0,"userName":"","userKarma":0,"sessionID":"8hakpnm5r4lknrlkbu5chj04cc8u6ed1","userBanTime":"","isUserBanned":false,"isStoryAnimPreview":true,"isCommAnimPreview":true,"isScrollTopBtn":true,"isAjaxLoadMode":true,"isExpandedMode":true,"isCommentsBranchesHidden":false,"scriptName":"story.php","privateKey":"M09EY2Ni","uniqueBufferID":"4abef7375b","registrationKey":"e4e841148e","debugLocation":"","pickedDate":"2017-05-03","pageNumber":1,"environment":225,"developmentMode":false,"filter_name":"","upload_server_url":"http:\/\/u.pikabu.ru","max_comments_branch_depth":3};
+
+					/**
+					 * Create old global vars for back compatibility
+					 */
+					var logined = initParams.userID > 0 ? 1 : 0,
+						uCarma = initParams.userKarma,
+						phpSelf = initParams.scriptName,
+						ppk = initParams.privateKey,
+						bid = initParams.uniqueBufferID,
+						site_url = initParams.siteURL,
+						img_url = initParams.imgURL,
+						tag_str = "",
+						developmentMode = initParams.developmentMode,
+						is_twitmode = initParams.isAjaxLoadMode ? 1 : 0,
+						is_scrollmode = initParams.isExpandedMode ? 1 : 0,
+						regKey = initParams.registrationKey,
+						sessID = initParams.sessionID,
+						picker_date = new Date(initParams.pickedDate),
+						pl = 0,
+						page_num = initParams.pageNumber,
+						dev = initParams.developmentMode,
+						nextJS = {
+							mv: {
+								facebookWidget: false
+							},
+							adbix: 0,
+							banned: initParams.isUserBanned,
+							bannedTime: initParams.userBanTime,
+							best: "",
+							listDate: "",
+							gif: {
+							    background: true,
+							    showComment: !initParams.isCommAnimPreview,
+							    showStory: !initParams.isStoryAnimPreview
+							},
+							options: {
+							    autoShowGif: initParams.isCommAnimPreview
+							},
+							filterName: initParams.filter_name,
+							user: {
+							    id: initParams.userID,
+							    name: initParams.userName
+							},
+							scrollToTop: initParams.isScrollTopBtn,
+							hideSaveMenu: initParams.isHideSaveMenu,
+							location: initParams.debugLocation
+						};
+				</script>
+			
+			<link type="text/css" rel="stylesheet" href="http://cs.pikabu.ru/app/1.1.288/vendors/font-awesome/css/font-awesome.min.css">
+ 			<link type="text/css" rel="stylesheet" href="http://cs.pikabu.ru/app/1.1.330/main/style.css">
+		
+			<script type="text/javascript" charset="utf-8" src="http://cs.pikabu.ru/app/1.1.288/vendors/jquery/js/jquery.min.js"></script>
+ 			<script type="text/javascript" charset="utf-8" src="http://cs.pikabu.ru/app/1.1.334/main/app.js" id="applicationMain" data-environment="production" data-version="1.1.334"></script>
+		
+				<script type="text/javascript">
+					$.ajaxSetup({headers: {"X-Csrf-Token" : initParams.sessionID}});
+					$.browser = {safari: false, opera: false};
+				</script>
+			
+					<link href="http://cs.pikabu.ru/css/yadirect/dcomments_new.css?2" type="text/css" rel="stylesheet">
+				
+				<link href="http://cs.pikabu.ru/css/style2013_1.css?299" type="text/css" rel="stylesheet">
+				<link href="http://cs.pikabu.ru/css/style_new.css?80" type="text/css" rel="stylesheet">
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/jquery.form.js"></script>
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/over_js8.js?75"></script>
+
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/select.js" defer></script>
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/icq.js" defer></script>
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/jquery.impromptu.js" defer></script>
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/jquery.scrollTo.js" defer></script>
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/jquery.color.js" defer></script>
+
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/community.js" defer></script>
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/dig.js?01" defer></script>
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/main28.js?04" defer></script>
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/ajax_login.js?05" defer></script>
+
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/jquery.ui.core.min.js" defer></script>
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/jquery-ui-1.10.4.custom.min.js" defer></script>
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/jquery.ui.datepicker.min.js" defer></script>
+				<script type="text/javascript" src="http://cs.pikabu.ru/js/datepicker-ru.js" defer></script>
+				<script type="text/javascript" async src="https://relap.io/api/v6/head.js?token=cwtzjwuPjQ3w9Pfy"></script>
+			
+				<script type="text/javascript">
+				(function() {
+					var purl = window.location.href;
+					var url = '//ads.pubmatic.com/AdServer/js/pwt/155949/97';
+					var profileVersionId = '';
+					if(purl.indexOf('pwtv=')>0){
+						var regexp = /pwtv=(.*?)(&|$)/g;
+						var matches = regexp.exec(purl);
+						if(matches.length >= 2 && matches[1].length > 0){
+							profileVersionId = '/'+matches[1];
+						}
+					}
+					var wtads = document.createElement('script');
+					wtads.async = true;
+					wtads.type = 'text/javascript';
+					wtads.src = url+profileVersionId+'/pwt.js';
+					var node = document.getElementsByTagName('script')[0];
+					node.parentNode.insertBefore(wtads, node);
+				})();
+				</script>
+				</head>
+				<body style="background-color: white;">
+			
+				<div class="header-cont">
+			
+						<a href="http://pikabu.ru/story/t_rkol_gl_maikhniemyaonomu_seyla_stakamvmemu__4712955" target="_blank">
+							<div id="branding_ad_header" title="" style="
+									background: url('http://pikabu.ru/images/header_bg_white.png') repeat-x 100% 0, url('http://cs9.pikabu.ru/post_img/2017/04/28/9/149339481994776882.jpg') no-repeat center;
+									background-color: #111139;
+									width: 100%;
+									height: 264px;
+									margin-bottom: -64px;
+									display: block !important;
+	                                visibility: visible !important;
+								" onclick="yaCounter174977.reachGoal('branding_click', {position: 'Шапка'}); return true;">
+							</div>
+						</a>
+					
+					<link rel="stylesheet" href="/css/ad_branding_video.css?17">
+					<style type="text/css">
+						div.ad-video-btn {
+							width: 210px;
+							height: 45px;
+							background: transparent URL("http://cs9.pikabu.ru/post_img/2017/04/28/10/149339742787758958.png") 0 0 no-repeat;
+							position: absolute;
+							top: 42px;
+							left: 50%;
+							margin: 0 0 0 -555px;
+							cursor: pointer;
+						}
+						div.ad-video-btn:hover {
+							background-position: -210px 0;
+						}
+						div.ad-video-btn:active {
+							background-position: -420px 0;
+						}
+					</style>
+					<div class="ad-reset ad-video-btn"></div>
+					<div class="ad-reset ad-video-bg">
+						<div class="ad-reset ad-video-layer"></div>
+						<div class="ad-reset ad-video-cont" data-w="1200" data-h="680">
+							<div class="ad-reset ad-video-close"><i class="fa fa-close"></i></div>
+							<div class="ad-reset ad-video-box" data-id="qY1AxS2sY-M"></div>
+						</div>
+					</div>
+					<script type="text/javascript" src="/css/ad_branding_video.js?17"></script>
+				
+						<!-- аудит брендирования #0 -->
+		                <img src="https://www.tns-counter.ru/V13a****adwatch_ru/ru/UTF-8/tmsec=adwatch_cid1017931-posid1214559/%aw_random%" style="width: 1px; height: 1px; opacity: 0.01; position: absolute">
+					
+					<div>
+					<table id="header_t" class="header-table" cellpadding="0" cellspacing="0">
+						<tr>
+						<td class="header-logo">
+							<a href="http://pikabu.ru" class="no_ch">
+								<span class="b-logo"></span>
+							</a>
+						</td>
+						<td class="header-nav">
+							<table cellpadding="0" cellspacing="0">
+								<colgroup>
+									<col />
+									<col style="width: 222px;" />
+								</colgroup>
+								<tbody>
+								<tr>
+									<td colspan="2" class="header-nav-top">
+									</td>
+								</tr>
+								<tr>
+									<td class="header-nav-bottom">
+										<ul class="menu">
+			
+					<li class="active2"><a>Комментарии</a></li>
+				
+					<li class="noactive menu-item-default"><a href="http://pikabu.ru/hot" class="no_ch">Горячее</a></li>
+				
+					<li class="noactive menu-item-default"><a href="http://pikabu.ru/best" class="no_ch">Лучшее</a></li>
+				
+					<li class="noactive menu-item-default"><a href="http://pikabu.ru/new" class="no_ch">Свежее</a></li>
+				
+					<li class="noactive menu-item-default large"><a href="http://pikabu.ru/communities" class="no_ch">Сообщества</a></li>
+				
+											</ul>
+										</td>
+										<td class="header-nav-right">
+										</td>
+									</tr>
+									</tbody>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			
+					<div id="wrap">
+				
+				<table border="0" cellspacing="0" cellpadding="0" style="width: 100%">
+					<tr>
+						<td style="vertical-align: top; text-align: center" class="main-b">
+							<table class="inner_wrap" cellspacing="0" cellpadding="0">
+			
+					<col />
+					<col class="inner_wrap_content" />
+					<tr>
+						<td>&nbsp;</td>
+						<td style="padding-left: 0px; padding-right: 0px; text-align: left;">
+				<!-- cached -->
+				<div class="page-story" data-user-in-comments="0">
+			
+					<input type="hidden" name="save-cats" value="[{&quot;id&quot;:0,&quot;name&quot;:&quot;\u041e\u0431\u0449\u0435\u0435&quot;,&quot;count&quot;:1}]">
+				
+				<!--story_4336666_start-->
+				<div class="story" data-story-id="4336666" data-visited="true" data-story-long="false">
+					<div class="story__left">
+				
+					<div class="story__rating-block" data-vote="0" data-story-id="4336666" data-can-vote="true">
+						<div class="story__rating-up" title="Поставить плюсик"></div>
+						<div class="story__rating-count">
+				17
+						</div>
+						<div class="story__rating-down" title="Поставить минус"></div>
+					</div>
+				
+					<div class="story__scroll-wrapper">
+						<div class="story__scroll">
+							<div class="story__toggle-button story__toggle-button-scroll" title="Показать/скрыть пост" data-story-id="4336666" data-story-long="false" data-story-type="gtpost">
+								<i class="i-sprite--inline-block i-sprite--feed__gtpost-hide"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+			
+				<div class="story__main">
+					<div class="story__header first_story">
+						<div class="story__header-title">
+			
+					<a href="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666" target="_blank"  class="story__title-link story__title-link_visited_yes">Робот на NodeMCU ESP8266</a>
+				
+					<a class="story__authors" href="http://pikabu.ru/search.php?n=16&r=3">[моё]</a>
+				
+				</div>
+			
+				<div class="story__header-additional">
+			
+					<!--noindex-->
+					<div class="story__toggle-button" title="Показать/скрыть пост" data-story-id="4336666" data-story-long="false" data-story-type="gtpost">
+						<i class="i-sprite--inline-block i-sprite--feed__gtpost-hide"></i>
+					</div>
+					<!--/noindex-->
+				
+				<div class="story__header-additional-wrapper">
+			<a class="story__comments-count story__to-comments" href="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666#comments">8 Комментариев</a> <img src="http://cs.pikabu.ru/assets/svg/user.svg" width="10" height="11" class="story__user-icon"><a class="story__author" href="http://pikabu.ru/profile/ProstoBrat">ProstoBrat</a>
+					в <a href="/community/TECHNO_BROTHER">TECHNO BROTHER</a>
+				
+					<div class="story__date" title="1468491978">293 дня назад</div>&nbsp;
+				
+				<div class="story__tags">
+			
+						<a href="http://pikabu.ru/tag/NodeMCU/hot" target="_blank" class="story__tag" title="Поиск по тегу &quot;NodeMCU&quot;">
+							NodeMCU
+						</a>
+					
+						<a href="http://pikabu.ru/tag/%F0%EE%E1%EE%F2%20%ED%E0%20NodeMCU/hot" target="_blank" class="story__tag" title="Поиск по тегу &quot;робот на NodeMCU&quot;">
+							робот на NodeMCU
+						</a>
+					
+						<a href="http://pikabu.ru/tag/NodeMCU%20L298N/hot" target="_blank" class="story__tag" title="Поиск по тегу &quot;NodeMCU L298N&quot;">
+							NodeMCU L298N
+						</a>
+					
+						<a href="http://pikabu.ru/tag/ESP8266%20%F0%EE%E1%EE%F2/hot" target="_blank" class="story__tag" title="Поиск по тегу &quot;ESP8266 робот&quot;">
+							ESP8266 робот
+						</a>
+					
+						<a href="http://pikabu.ru/tag/%F0%EE%E1%EE%F2%20NodeMCU%20Android/hot" target="_blank" class="story__tag" title="Поиск по тегу &quot;робот NodeMCU Android&quot;">
+							робот NodeMCU Android
+						</a>
+					
+				</div>
+			
+					<div class="story__save i-sprite--comments__save" data-story-id="4336666" title="Сохранить" data-saved="false"></div>
+				
+				</div>
+			
+							</div>
+						</div>
+					<div class="story__wrapper" style="display: block">
+			
+				<div class="b-story__content b-story-blocks b-story-blocks_with-border" data-expanded="true">
+					<div class="b-story-blocks__wrapper" style="">
+			
+						<div class="b-story-block b-story-block_type_text">
+							<div class="b-story-block__content">
+								<p><p>И так поехали...</p><p>Подключение до безумия простое - питание на nodeMCU подавать на контакт vin (там есть стабилизатор), про GND все и так ясно - минус он и в Африке земля))</p><p>На nodeMCU заливаем скетч из архива, на смартфон - андроид-приложение из того-же архива</p><p>если не хотим терять инет на смартфоне - в скетче забить имя и пароль своей точки доступа, если управляем роботом на открытом воздухе - на это можно забить и просто подключиться к АР, созданной самой NodeMCU, тогда IP будет 192.168.4.1</p><p>Ну вот теперь открываем android приложение и... поехали!))</p></p>
+							</div>
+						</div>
+					
+							<div class="b-story-block b-story-block_type_image">
+								<div class="b-story-block__content">
+						
+								<a href="http://cs8.pikabu.ru/post_img/big/2016/07/14/7/1468491352111854412.jpg" target="_blank"><img src="http://cs8.pikabu.ru/post_img/2016/07/14/7/1468491352111854412.jpg" data-large-image="http://cs8.pikabu.ru/post_img/big/2016/07/14/7/1468491352111854412.jpg" data-viewable="true" alt="Робот на NodeMCU ESP8266 NodeMCU, робот на NodeMCU, NodeMCU L298N, ESP8266 робот, робот NodeMCU Android" style="" data-height="404"></a>
+							
+								</div>
+							</div>
+						
+						<div class="b-story-block b-story-block_type_text">
+							<div class="b-story-block__content">
+								<p><p>Архив со скетчем для nodeMCU и android приложением берем тут: <noindex><a rel="nofollow" href="https://yadi.sk/d/MOTB9OBVtGmYQ" target="_blank">https://yadi.sk/d/MOTB9OBVtGmYQ</a></noindex></p><p><br></p><p>есть видео с этим девайсом на канале "Ардуино это просто" <noindex><a rel="nofollow" href="https://www.youtube.com/channel/UC5Mq-PGM7Ww4Nt0EyUFJo3g" target="_blank">https://www.youtube.com/channel/UC5Mq-PGM7Ww4Nt0EyUFJo3g</a></noindex></p></p>
+							</div>
+						</div>
+					
+				</div>
+			
+				</div>
+			
+				<div class="story__footer">
+			
+					<ul class="story__rating-block story__rating-block_small" data-story-id="4336666">
+						<li class="story__rating-up-small " data-rating="up">
+							<i class="i-sprite--comments__rating-up"></i>
+						</li>
+						<li class="story__rating-down-small " data-rating="down">
+							<i class="i-sprite--comments__rating-down"></i>
+						</li>
+					</ul>
+				
+					<div class="story__slide-up">свернуть</div>
+				</div>
+			
+						</div>
+					</div>
+			
+				</div>
+				<!--story_4336666_end-->
+			
+					</div>
+				
+					<table class="inner_wrap" cellspacing="0" cellpadding="0">
+						<colgroup>
+							<col/>
+							<col class="inner_wrap_content"/>
+						</colgroup>
+						<tbody>
+						<tr>
+							<td></td>
+							<td>
+				
+				<noindex>
+				<!--+ social segment frontend-web-pikabu#330 -->
+				<div class="b-social" data-url="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666" data-title="Робот на NodeMCU ESP8266" data-image="http://s8.pikabu.ru/post_img/2016/07/14/7/og_og_1468491969272876866.jpg" data-description="И так поехали...Подключение до безумия простое - питание на nodeMCU подавать на контакт vin (там есть стабилизатор), про GND все и так ясно - минус он и в Африке земля))На nodeMCU заливаем скетч из ар Автор: ProstoBrat" data-time="1468491978">
+					<div class="b-social__buttons">
+						<div class="b-social-button b-social-button_type_facebook">
+							<div class="fb-like" style="margin-right: -4px;" data-href="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666" data-layout="button" data-action="like" data-show-faces="false" data-share="false"></div>
+							<i class="i-sprite--social__facebook"></i><span class="b-social-button__counter" style="vertical-align: top">0</span>
+						</div>
+						<div class="b-social-button b-social-button_type_vk">
+							<span class="b-social-button__icon"><i class="i-sprite--social__vk"></i></span><span class="b-social-button__counter">0</span>
+						</div>
+						<div class="b-social-button b-social-button_type_twitter">
+							<span class="b-social-button__icon"><i class="i-sprite--social__twitter"></i></span><span class="b-social-button__counter">0</span>
+						</div>
+						<div class="b-social-button b-social-button_type_save" data-count="26" data-saved="false" data-story-id="4336666">
+							<span class="b-social-button__icon-save">
+								<span class="b-social-button__icon-in i-sprite--social__save" style=""></span>
+								<span class="b-social-button__icon-in i-sprite--social__saved" style="visibility: hidden;"></span>
+							</span><span class="b-social-button__counter">0</span>
+						</div>
+					</div>
+					<div class="b-social__widgets">
+						<div class="b-social-widget b-social-widget_type_vk" style="display: none">
+							<div id="social-vk-widget"></div>
+							<a class="b-social-widget__link" href="#">Я уже с вами :)</a>
+						</div>
+						<div class="b-social-widget b-social-widget_type_twitter" style="display: none">
+							<div id="social-twitter-widget">
+								<a class="twitter-timeline" width="300"height="320" data-dnt="true" href="https://twitter.com/pikabu_vk" data-widget-id="568363779285860352">Твиты от @pikabu_vk</a>
+							</div>
+							<a class="b-social-widget__link" href="#">Я уже с вами :)</a>
+						</div>
+						<div class="b-social-widget b-social-widget_type_facebook" style="display: none"п>
+							<!--div class="b-social-widget__decoration i-sprite--social__decoration"></div-->
+							<div class="b-social-widget__wrapper">
+								<!--div class="fb-like-box" data-href="https://www.facebook.com/pikabu.ru" data-width="580" data-height="180" data-colorscheme="light" data-show-faces="true" data-header="false" data-stream="false" data-show-border="false"></div-->
+								<div class="b-social-widget__facebook-subscribe">Подписаться на Пикабу: </div><div class="fb-like" data-href="https://www.facebook.com/pikabu.ru" data-layout="standard" data-action="like" data-show-faces="false" data-share="false"></div>
+							</div>
+							<a class="b-social-widget__link b-social-widget__link_type_facebook" href="#">Я уже с вами :)</a>
+						</div>
+					</div>
+				</div>
+				<!--- social segment frontend-web-pikabu#330 -->
+			
+				<div class="b-story-duplicates" style="display: none;"></div>
+				<div class="b-story-info" id="comments">
+				<div class="b-story-info__main">
+			8 комментариев, по <span class="b-story-info__set-order" title="изменить порядок комментариев">актуальности</span>
+						<div class="b-story-info__box-order" style="display: none;">
+							<p><label><input type="radio" name="comment_order" value="1" > Рейтингу</label></p>
+							<p><label><input type="radio" name="comment_order" value="2" > Времени</label></p>
+							<p><label><input type="radio" name="comment_order" value="3" checked="checked"> Актуальности</label></p>
+						</div>
+					</div>
+					<div class="b-story-info__custom">
+			
+					<div class="b-story__rating" data-pluses="21" data-minuses="4">
+						<span class="b-story__rating-pluses" style="width: 84%"></span><span class="b-story__rating-minuses" style="width: 16%"></span>
+					</div>
+				
+					<i class="b-story-info__duplicates i-sprite--page-story__duplicates-has"
+						title="показать дубликаты" data-has="true"
+						data-story-id="4336666"></i>
+				
+					</div>
+				
+				</div>
+			</noindex>
+				<div class="b-comments_type_main" data-ignore-code="0">
+			
+				<div id="comment_69105155" class="b-comment" data-id="69105155" data-parent-id="0" data-level="0" data-editable="false" data-vote="0">
+					<div class="b-comment__body ">
+						<div class="b-comment__header">
+							<div class="b-comment__rating-count" title="Рейтинг комментария">0</div>
+							<ul class="b-comment__rating">
+								<li class="b-comment__rating-up" data-rating="up">
+									<i class="i-sprite--comments__rating-up"></i>
+								</li>
+								<li class="b-comment__rating-down" data-rating="down">
+									<i class="i-sprite--comments__rating-down"></i>
+								</li>
+							</ul>
+							<div class="b-comment__user">
+								<a href="http://pikabu.ru/profile/BloodyFenix"><img src="http://cs6.pikabu.ru/images/avatars/404/s404687.jpg?1233212156">&nbsp;<span class="">BloodyFenix</span></a> 
+								<span>отправил</span>
+								<time class="b-comment__time" datetime="1468569222">292 дня назад</time>
+							</div>
+							<!--noindex-->
+							<div class="b-comment__tools">
+								<div class="b-comment__tool b-comment__tool-link" title="Ссылка на комментарий"><a name="comment_69105155" href="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666#comment_69105155" class="" title="" >#</a></div>
+
+								<div class="b-comment__tool b-comment__tool-root i-sprite--comments__root" title="Показать родительский комментарий" style="display: none"></div>
+								<div class="b-comment__tool b-comment__tool-root-back i-sprite--comments__root-back" title="Вернуться обратно" style="display: none"></div>
+								<div class="b-comment__tool b-comment__tool-branch i-sprite--comments__branch" title="Показать/скрыть ветку комментариев" style="display: none"></div>
+								<div class="b-comment__tool b-comment__tool-save i-sprite--comments__save" title="Сохранить"></div>
+			
+							</div>
+							<!--/noindex-->
+						</div>
+						<!--noindex-->
+						<span class="b-comment__content-toggle"  style="display: none">показать комментарий</span>
+						<!--/noindex-->
+						<div class="b-comment__content">
+							<p>На схеме из 5v MCU подключается на прямую в 12v - это нормально ?</p>
+			
+						</div>
+						<!--noindex-->
+						<div class="b-comment__controls" style="display: block">
+							<button class="b-button b-comment__control b-comment__control-reply " data-ignore-code="0">ответить</button>
+							<button class="b-button b-comment__control b-comment__control-edit" style="display: none">редактировать</button>
+							<button class="b-button b-comment__control b-comment__control-remove" style="display: none">удалить</button>
+							<span class="b-comment__control-error" style="display: none"></span>
+						</div>
+						<div class="b-comment__reply-wrapper" style="display: none"></div>
+						<!--/noindex-->
+					</div>
+					<div class="b-comment-toggle b-comment-toggle_type_collapse" style="display: inline-block">
+						<div class="b-comment-toggle__icon fa fa-minus-square-o"></div>
+						<div class="b-comment-toggle__count" style="display: none">раскрыть ветвь <span class="b-comment-toggle__count-text">5</span> <i class="i-sprite--inline-block i-sprite--comments__show"></i></div>
+					</div>
+					<div class="b-comments b-comments_level_0" style="display: block">
+			
+				<div id="comment_69105694" class="b-comment" data-id="69105694" data-parent-id="69105155" data-level="1" data-editable="false" data-vote="0">
+					<div class="b-comment__body ">
+						<div class="b-comment__header">
+							<div class="b-comment__rating-count" title="Рейтинг комментария">-2</div>
+							<ul class="b-comment__rating">
+								<li class="b-comment__rating-up" data-rating="up">
+									<i class="i-sprite--comments__rating-up"></i>
+								</li>
+								<li class="b-comment__rating-down" data-rating="down">
+									<i class="i-sprite--comments__rating-down"></i>
+								</li>
+							</ul>
+							<div class="b-comment__user">
+								<a href="http://pikabu.ru/profile/ProstoBrat"><img src="http://cs6.pikabu.ru/images/avatars/1362/s1362289-1516708647.jpg">&nbsp;<span class=" b-comment__user_author_story">ProstoBrat</span></a> 
+								<span>отправлено</span>
+								<time class="b-comment__time" datetime="1468569817">292 дня назад</time>
+							</div>
+							<!--noindex-->
+							<div class="b-comment__tools">
+								<div class="b-comment__tool b-comment__tool-link" title="Ссылка на комментарий"><a name="comment_69105694" href="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666#comment_69105694" class="" title="" >#</a></div>
+
+								<div class="b-comment__tool b-comment__tool-root i-sprite--comments__root" title="Показать родительский комментарий" ></div>
+								<div class="b-comment__tool b-comment__tool-root-back i-sprite--comments__root-back" title="Вернуться обратно" style="display: none"></div>
+								<div class="b-comment__tool b-comment__tool-branch i-sprite--comments__branch" title="Показать/скрыть ветку комментариев" ></div>
+								<div class="b-comment__tool b-comment__tool-save i-sprite--comments__save" title="Сохранить"></div>
+			
+							</div>
+							<!--/noindex-->
+						</div>
+						<!--noindex-->
+						<span class="b-comment__content-toggle"  style="display: none">показать комментарий</span>
+						<!--/noindex-->
+						<div class="b-comment__content">
+							<p>Ну что блин тут не ясно а? на этой &nbsp;5v MCU есть вход на 20 мать их вольт)) это называется встроенный стабилизатор)</p><div class="b-p b-p_type_image"><a href="http://cs4.pikabu.ru/images/big_size_comm/2016-07_3/1468569817150822554.jpg"><img class="b-image" data-viewable="true" data-large-image="http://s4.pikabu.ru/images/big_size_comm/2016-07_3/1468569817150822554.jpg" src="http://cs4.pikabu.ru/images/previews_comm/2016-07_3/1468569817150822554.jpg" data-width="400" data-height="266"></a></div>
+			
+						</div>
+						<!--noindex-->
+						<div class="b-comment__controls" style="display: block">
+							<button class="b-button b-comment__control b-comment__control-reply " data-ignore-code="0">ответить</button>
+							<button class="b-button b-comment__control b-comment__control-edit" style="display: none">редактировать</button>
+							<button class="b-button b-comment__control b-comment__control-remove" style="display: none">удалить</button>
+							<span class="b-comment__control-error" style="display: none"></span>
+						</div>
+						<div class="b-comment__reply-wrapper" style="display: none"></div>
+						<!--/noindex-->
+					</div>
+					<div class="b-comment-toggle b-comment-toggle_type_collapse" style="display: inline-block">
+						<div class="b-comment-toggle__icon fa fa-minus-square-o"></div>
+						<div class="b-comment-toggle__count" style="display: none">раскрыть ветвь <span class="b-comment-toggle__count-text">4</span> <i class="i-sprite--inline-block i-sprite--comments__show"></i></div>
+					</div>
+					<div class="b-comments b-comments_level_0" style="display: block">
+			
+				<div id="comment_69106238" class="b-comment" data-id="69106238" data-parent-id="69105694" data-level="2" data-editable="false" data-vote="0">
+					<div class="b-comment__body ">
+						<div class="b-comment__header">
+							<div class="b-comment__rating-count" title="Рейтинг комментария">0</div>
+							<ul class="b-comment__rating">
+								<li class="b-comment__rating-up" data-rating="up">
+									<i class="i-sprite--comments__rating-up"></i>
+								</li>
+								<li class="b-comment__rating-down" data-rating="down">
+									<i class="i-sprite--comments__rating-down"></i>
+								</li>
+							</ul>
+							<div class="b-comment__user">
+								<a href="http://pikabu.ru/profile/BloodyFenix"><img src="http://cs6.pikabu.ru/images/avatars/404/s404687.jpg?1233212156">&nbsp;<span class="">BloodyFenix</span></a> 
+								<span>отправил</span>
+								<time class="b-comment__time" datetime="1468570401">292 дня назад</time>
+							</div>
+							<!--noindex-->
+							<div class="b-comment__tools">
+								<div class="b-comment__tool b-comment__tool-link" title="Ссылка на комментарий"><a name="comment_69106238" href="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666#comment_69106238" class="" title="" >#</a></div>
+
+								<div class="b-comment__tool b-comment__tool-root i-sprite--comments__root" title="Показать родительский комментарий" ></div>
+								<div class="b-comment__tool b-comment__tool-root-back i-sprite--comments__root-back" title="Вернуться обратно" style="display: none"></div>
+								<div class="b-comment__tool b-comment__tool-branch i-sprite--comments__branch" title="Показать/скрыть ветку комментариев" ></div>
+								<div class="b-comment__tool b-comment__tool-save i-sprite--comments__save" title="Сохранить"></div>
+			
+							</div>
+							<!--/noindex-->
+						</div>
+						<!--noindex-->
+						<span class="b-comment__content-toggle"  style="display: none">показать комментарий</span>
+						<!--/noindex-->
+						<div class="b-comment__content">
+							<p>Во-первых, у этой MCU есть выходы на 3.3v и 5v</p><p>Во-вторых, даже если б был выход на 20v, то 20v != 12v</p><div class="b-p b-p_type_image"><a href="http://cs4.pikabu.ru/images/big_size_comm/2016-07_3/146857070815025569.jpg"><img class="b-image" data-viewable="true" data-large-image="http://s4.pikabu.ru/images/big_size_comm/2016-07_3/146857070815025569.jpg" src="http://cs4.pikabu.ru/images/previews_comm/2016-07_3/146857070815025569.jpg" data-width="400" data-height="335"></a></div>
+			
+						</div>
+						<!--noindex-->
+						<div class="b-comment__controls" style="display: block">
+							<button class="b-button b-comment__control b-comment__control-reply " data-ignore-code="0">ответить</button>
+							<button class="b-button b-comment__control b-comment__control-edit" style="display: none">редактировать</button>
+							<button class="b-button b-comment__control b-comment__control-remove" style="display: none">удалить</button>
+							<span class="b-comment__control-error" style="display: none"></span>
+						</div>
+						<div class="b-comment__reply-wrapper" style="display: none"></div>
+						<!--/noindex-->
+					</div>
+					<div class="b-comment-toggle b-comment-toggle_type_expand" style="display: inline-block">
+						<div class="b-comment-toggle__icon fa fa-plus-square"></div>
+						<div class="b-comment-toggle__count" style="display: block">раскрыть ветвь <span class="b-comment-toggle__count-text">3</span> <i class="i-sprite--inline-block i-sprite--comments__show"></i></div>
+					</div>
+					<div class="b-comments b-comments_level_0" style="display: none">
+			
+				<div id="comment_69115971" class="b-comment" data-id="69115971" data-parent-id="69106238" data-level="3" data-editable="false" data-vote="0">
+					<div class="b-comment__body ">
+						<div class="b-comment__header">
+							<div class="b-comment__rating-count" title="Рейтинг комментария">0</div>
+							<ul class="b-comment__rating">
+								<li class="b-comment__rating-up" data-rating="up">
+									<i class="i-sprite--comments__rating-up"></i>
+								</li>
+								<li class="b-comment__rating-down" data-rating="down">
+									<i class="i-sprite--comments__rating-down"></i>
+								</li>
+							</ul>
+							<div class="b-comment__user">
+								<a href="http://pikabu.ru/profile/ProstoBrat"><img src="http://cs6.pikabu.ru/images/avatars/1362/s1362289-1516708647.jpg">&nbsp;<span class=" b-comment__user_author_story">ProstoBrat</span></a> 
+								<span>отправлено</span>
+								<time class="b-comment__time" datetime="1468580304">292 дня назад</time>
+							</div>
+							<!--noindex-->
+							<div class="b-comment__tools">
+								<div class="b-comment__tool b-comment__tool-link" title="Ссылка на комментарий"><a name="comment_69115971" href="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666#comment_69115971" class="" title="" >#</a></div>
+
+								<div class="b-comment__tool b-comment__tool-root i-sprite--comments__root" title="Показать родительский комментарий" ></div>
+								<div class="b-comment__tool b-comment__tool-root-back i-sprite--comments__root-back" title="Вернуться обратно" style="display: none"></div>
+								<div class="b-comment__tool b-comment__tool-branch i-sprite--comments__branch" title="Показать/скрыть ветку комментариев" ></div>
+								<div class="b-comment__tool b-comment__tool-save i-sprite--comments__save" title="Сохранить"></div>
+			
+							</div>
+							<!--/noindex-->
+						</div>
+						<!--noindex-->
+						<span class="b-comment__content-toggle"  style="display: none">показать комментарий</span>
+						<!--/noindex-->
+						<div class="b-comment__content">
+							<p>А дело мы имеем вот с этим, а вовсе не тем, что пиноут выше.</p><p>И тут без "Во х++" нижний левый пин является входом питания встроенного в плату стабилизатора.</p><div class="b-p b-p_type_image"><a href="http://cs8.pikabu.ru/images/big_size_comm/2016-07_3/1468580303178877588.png"><img class="b-image" data-viewable="true" data-large-image="http://s8.pikabu.ru/images/big_size_comm/2016-07_3/1468580303178877588.png" src="http://cs8.pikabu.ru/images/previews_comm/2016-07_3/1468580303178877588.png" data-width="400" data-height="336"></a></div>
+			
+						</div>
+						<!--noindex-->
+						<div class="b-comment__controls" style="display: block">
+							<button class="b-button b-comment__control b-comment__control-reply " data-ignore-code="0">ответить</button>
+							<button class="b-button b-comment__control b-comment__control-edit" style="display: none">редактировать</button>
+							<button class="b-button b-comment__control b-comment__control-remove" style="display: none">удалить</button>
+							<span class="b-comment__control-error" style="display: none"></span>
+						</div>
+						<div class="b-comment__reply-wrapper" style="display: none"></div>
+						<!--/noindex-->
+					</div>
+					<div class="b-comment-toggle b-comment-toggle_type_collapse" style="display: inline-block">
+						<div class="b-comment-toggle__icon fa fa-minus-square-o"></div>
+						<div class="b-comment-toggle__count" style="display: none">раскрыть ветвь <span class="b-comment-toggle__count-text">2</span> <i class="i-sprite--inline-block i-sprite--comments__show"></i></div>
+					</div>
+					<div class="b-comments b-comments_level_0" style="display: block">
+			
+				<div id="comment_69119536" class="b-comment" data-id="69119536" data-parent-id="69115971" data-level="4" data-editable="false" data-vote="0">
+					<div class="b-comment__body ">
+						<div class="b-comment__header">
+							<div class="b-comment__rating-count" title="Рейтинг комментария">-1</div>
+							<ul class="b-comment__rating">
+								<li class="b-comment__rating-up" data-rating="up">
+									<i class="i-sprite--comments__rating-up"></i>
+								</li>
+								<li class="b-comment__rating-down" data-rating="down">
+									<i class="i-sprite--comments__rating-down"></i>
+								</li>
+							</ul>
+							<div class="b-comment__user">
+								<a href="http://pikabu.ru/profile/BloodyFenix"><img src="http://cs6.pikabu.ru/images/avatars/404/s404687.jpg?1233212156">&nbsp;<span class="">BloodyFenix</span></a> 
+								<span>отправил</span>
+								<time class="b-comment__time" datetime="1468583536">292 дня назад</time>
+							</div>
+							<!--noindex-->
+							<div class="b-comment__tools">
+								<div class="b-comment__tool b-comment__tool-link" title="Ссылка на комментарий"><a name="comment_69119536" href="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666#comment_69119536" class="" title="" >#</a></div>
+
+								<div class="b-comment__tool b-comment__tool-root i-sprite--comments__root" title="Показать родительский комментарий" ></div>
+								<div class="b-comment__tool b-comment__tool-root-back i-sprite--comments__root-back" title="Вернуться обратно" style="display: none"></div>
+								<div class="b-comment__tool b-comment__tool-branch i-sprite--comments__branch" title="Показать/скрыть ветку комментариев" ></div>
+								<div class="b-comment__tool b-comment__tool-save i-sprite--comments__save" title="Сохранить"></div>
+			
+							</div>
+							<!--/noindex-->
+						</div>
+						<!--noindex-->
+						<span class="b-comment__content-toggle"  style="display: none">показать комментарий</span>
+						<!--/noindex-->
+						<div class="b-comment__content">
+							<p>т.е. ты хочешь сказать, что подаешь на бедную пяти волтовую MCU 12v и считаешь это нормой ?</p>
+			
+						</div>
+						<!--noindex-->
+						<div class="b-comment__controls" style="display: block">
+							<button class="b-button b-comment__control b-comment__control-reply " data-ignore-code="0">ответить</button>
+							<button class="b-button b-comment__control b-comment__control-edit" style="display: none">редактировать</button>
+							<button class="b-button b-comment__control b-comment__control-remove" style="display: none">удалить</button>
+							<span class="b-comment__control-error" style="display: none"></span>
+						</div>
+						<div class="b-comment__reply-wrapper" style="display: none"></div>
+						<!--/noindex-->
+					</div>
+					<div class="b-comment-toggle b-comment-toggle_type_collapse" style="display: inline-block">
+						<div class="b-comment-toggle__icon fa fa-minus-square-o"></div>
+						<div class="b-comment-toggle__count" style="display: none">раскрыть ветвь <span class="b-comment-toggle__count-text">1</span> <i class="i-sprite--inline-block i-sprite--comments__show"></i></div>
+					</div>
+					<div class="b-comments b-comments_level_0" style="display: block">
+			
+				<div id="comment_69119749" class="b-comment" data-id="69119749" data-parent-id="69119536" data-level="5" data-editable="false" data-vote="0">
+					<div class="b-comment__body ">
+						<div class="b-comment__header">
+							<div class="b-comment__rating-count" title="Рейтинг комментария">0</div>
+							<ul class="b-comment__rating">
+								<li class="b-comment__rating-up" data-rating="up">
+									<i class="i-sprite--comments__rating-up"></i>
+								</li>
+								<li class="b-comment__rating-down" data-rating="down">
+									<i class="i-sprite--comments__rating-down"></i>
+								</li>
+							</ul>
+							<div class="b-comment__user">
+								<a href="http://pikabu.ru/profile/ProstoBrat"><img src="http://cs6.pikabu.ru/images/avatars/1362/s1362289-1516708647.jpg">&nbsp;<span class=" b-comment__user_author_story">ProstoBrat</span></a> 
+								<span>отправлено</span>
+								<time class="b-comment__time" datetime="1468583732">292 дня назад</time>
+							</div>
+							<!--noindex-->
+							<div class="b-comment__tools">
+								<div class="b-comment__tool b-comment__tool-link" title="Ссылка на комментарий"><a name="comment_69119749" href="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666#comment_69119749" class="" title="" >#</a></div>
+
+								<div class="b-comment__tool b-comment__tool-root i-sprite--comments__root" title="Показать родительский комментарий" ></div>
+								<div class="b-comment__tool b-comment__tool-root-back i-sprite--comments__root-back" title="Вернуться обратно" style="display: none"></div>
+								<div class="b-comment__tool b-comment__tool-branch i-sprite--comments__branch" title="Показать/скрыть ветку комментариев" ></div>
+								<div class="b-comment__tool b-comment__tool-save i-sprite--comments__save" title="Сохранить"></div>
+			
+							</div>
+							<!--/noindex-->
+						</div>
+						<!--noindex-->
+						<span class="b-comment__content-toggle"  style="display: none">показать комментарий</span>
+						<!--/noindex-->
+						<div class="b-comment__content">
+							<p>Мозг включи и почитай, что такое вход vin</p>
+			
+						</div>
+						<!--noindex-->
+						<div class="b-comment__controls" style="display: block">
+							<button class="b-button b-comment__control b-comment__control-reply " data-ignore-code="0">ответить</button>
+							<button class="b-button b-comment__control b-comment__control-edit" style="display: none">редактировать</button>
+							<button class="b-button b-comment__control b-comment__control-remove" style="display: none">удалить</button>
+							<span class="b-comment__control-error" style="display: none"></span>
+						</div>
+						<div class="b-comment__reply-wrapper" style="display: none"></div>
+						<!--/noindex-->
+					</div>
+					<div class="b-comment-toggle b-comment-toggle_type_collapse" style="display: none">
+						<div class="b-comment-toggle__icon fa fa-minus-square-o"></div>
+						<div class="b-comment-toggle__count" style="display: none">раскрыть ветвь <span class="b-comment-toggle__count-text">0</span> <i class="i-sprite--inline-block i-sprite--comments__show"></i></div>
+					</div>
+					<div class="b-comments b-comments_level_0" style="display: none">
+			
+					</div>
+				</div>
+			
+					</div>
+				</div>
+			
+					</div>
+				</div>
+			
+					</div>
+				</div>
+			
+					</div>
+				</div>
+			
+					</div>
+				</div>
+			
+				<div id="comment_69059030" class="b-comment" data-id="69059030" data-parent-id="0" data-level="0" data-editable="false" data-vote="0">
+					<div class="b-comment__body ">
+						<div class="b-comment__header">
+							<div class="b-comment__rating-count" title="Рейтинг комментария">0</div>
+							<ul class="b-comment__rating">
+								<li class="b-comment__rating-up" data-rating="up">
+									<i class="i-sprite--comments__rating-up"></i>
+								</li>
+								<li class="b-comment__rating-down" data-rating="down">
+									<i class="i-sprite--comments__rating-down"></i>
+								</li>
+							</ul>
+							<div class="b-comment__user">
+								<a href="http://pikabu.ru/profile/majorjacks"><span class="">majorjacks</span></a> 
+								<span>отправлено</span>
+								<time class="b-comment__time" datetime="1468492965">293 дня назад</time>
+							</div>
+							<!--noindex-->
+							<div class="b-comment__tools">
+								<div class="b-comment__tool b-comment__tool-link" title="Ссылка на комментарий"><a name="comment_69059030" href="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666#comment_69059030" class="" title="" >#</a></div>
+
+								<div class="b-comment__tool b-comment__tool-root i-sprite--comments__root" title="Показать родительский комментарий" style="display: none"></div>
+								<div class="b-comment__tool b-comment__tool-root-back i-sprite--comments__root-back" title="Вернуться обратно" style="display: none"></div>
+								<div class="b-comment__tool b-comment__tool-branch i-sprite--comments__branch" title="Показать/скрыть ветку комментариев" style="display: none"></div>
+								<div class="b-comment__tool b-comment__tool-save i-sprite--comments__save" title="Сохранить"></div>
+			
+							</div>
+							<!--/noindex-->
+						</div>
+						<!--noindex-->
+						<span class="b-comment__content-toggle"  style="display: none">показать комментарий</span>
+						<!--/noindex-->
+						<div class="b-comment__content">
+							Не всё так просто... при использовании мощных моторов, плата будет перегружаться или глючить. И она сама, кстати, откуда питается, на рисунке не отображено? Какое напряжение, 220?
+			
+						</div>
+						<!--noindex-->
+						<div class="b-comment__controls" style="display: block">
+							<button class="b-button b-comment__control b-comment__control-reply " data-ignore-code="0">ответить</button>
+							<button class="b-button b-comment__control b-comment__control-edit" style="display: none">редактировать</button>
+							<button class="b-button b-comment__control b-comment__control-remove" style="display: none">удалить</button>
+							<span class="b-comment__control-error" style="display: none"></span>
+						</div>
+						<div class="b-comment__reply-wrapper" style="display: none"></div>
+						<!--/noindex-->
+					</div>
+					<div class="b-comment-toggle b-comment-toggle_type_collapse" style="display: inline-block">
+						<div class="b-comment-toggle__icon fa fa-minus-square-o"></div>
+						<div class="b-comment-toggle__count" style="display: none">раскрыть ветвь <span class="b-comment-toggle__count-text">1</span> <i class="i-sprite--inline-block i-sprite--comments__show"></i></div>
+					</div>
+					<div class="b-comments b-comments_level_0" style="display: block">
+			
+				<div id="comment_69105158" class="b-comment" data-id="69105158" data-parent-id="69059030" data-level="1" data-editable="false" data-vote="0">
+					<div class="b-comment__body ">
+						<div class="b-comment__header">
+							<div class="b-comment__rating-count" title="Рейтинг комментария">0</div>
+							<ul class="b-comment__rating">
+								<li class="b-comment__rating-up" data-rating="up">
+									<i class="i-sprite--comments__rating-up"></i>
+								</li>
+								<li class="b-comment__rating-down" data-rating="down">
+									<i class="i-sprite--comments__rating-down"></i>
+								</li>
+							</ul>
+							<div class="b-comment__user">
+								<a href="http://pikabu.ru/profile/AlexZero"><img src="http://cs6.pikabu.ru/images/avatars/464/s464090-1737143759.jpg">&nbsp;<span class="">AlexZero</span></a> 
+								<span>отправлено</span>
+								<time class="b-comment__time" datetime="1468569227">292 дня назад</time>
+							</div>
+							<!--noindex-->
+							<div class="b-comment__tools">
+								<div class="b-comment__tool b-comment__tool-link" title="Ссылка на комментарий"><a name="comment_69105158" href="http://pikabu.ru/story/robot_na_nodemcu_esp8266_4336666#comment_69105158" class="" title="" >#</a></div>
+
+								<div class="b-comment__tool b-comment__tool-root i-sprite--comments__root" title="Показать родительский комментарий" ></div>
+								<div class="b-comment__tool b-comment__tool-root-back i-sprite--comments__root-back" title="Вернуться обратно" style="display: none"></div>
+								<div class="b-comment__tool b-comment__tool-branch i-sprite--comments__branch" title="Показать/скрыть ветку комментариев" ></div>
+								<div class="b-comment__tool b-comment__tool-save i-sprite--comments__save" title="Сохранить"></div>
+			
+							</div>
+							<!--/noindex-->
+						</div>
+						<!--noindex-->
+						<span class="b-comment__content-toggle"  style="display: none">показать комментарий</span>
+						<!--/noindex-->
+						<div class="b-comment__content">
+							<p>Да ну-у-у-у, смотри какие моторы, 380в не меньше.</p>
+			
+						</div>
+						<!--noindex-->
+						<div class="b-comment__controls" style="display: block">
+							<button class="b-button b-comment__control b-comment__control-reply " data-ignore-code="0">ответить</button>
+							<button class="b-button b-comment__control b-comment__control-edit" style="display: none">редактировать</button>
+							<button class="b-button b-comment__control b-comment__control-remove" style="display: none">удалить</button>
+							<span class="b-comment__control-error" style="display: none"></span>
+						</div>
+						<div class="b-comment__reply-wrapper" style="display: none"></div>
+						<!--/noindex-->
+					</div>
+					<div class="b-comment-toggle b-comment-toggle_type_collapse" style="display: none">
+						<div class="b-comment-toggle__icon fa fa-minus-square-o"></div>
+						<div class="b-comment-toggle__count" style="display: none">раскрыть ветвь <span class="b-comment-toggle__count-text">0</span> <i class="i-sprite--inline-block i-sprite--comments__show"></i></div>
+					</div>
+					<div class="b-comments b-comments_level_0" style="display: none">
+			
+					</div>
+				</div>
+			
+					</div>
+				</div>
+			
+				</div>
+			
+						<table>
+							<tr>
+								<td>
+									<div style="margin-left: 91px; margin-top: 5px; width: 530px" class="story__gag-container">
+					
+				<div class="story__gag story__gag_relative">
+					<div id="yandex_ad_1493812076_36997" data-ad="yandex_ctx_story"></div>
+				</div>
+				<script type="text/javascript">
+					(function(w, d, n, s, t) {
+						w[n] = w[n] || [];
+						w[n].push(function() {
+							Ya.Direct.insertInto(
+								56459,
+								"yandex_ad_1493812076_36997",
+								{"site_charset":"windows-1251","stat_id":"4","ad_format":"direct","font_size":0.8,"font_family":"tahoma","type":"horizontal","border_type":"none","limit":1,"title_font_size":3,"site_bg_color":"FFFFFF","header_bg_color":"FFFFFF","bg_color":"FFFFFF","title_color":"217CB6","url_color":"777777","all_color":"777777","text_color":"444444","sitelinks_color":"777777","hover_color":"777777"}
+							);
+						});
+						t = d.documentElement.firstChild;
+						s = d.createElement("script");
+						s.type = "text/javascript";
+						s.src = "http://an.yandex.ru/system/context.js";
+						s.setAttribute("async", "true");
+						t.insertBefore(s, t.firstChild);
+					})(window, document, "yandex_context_callbacks");
+				</script>
+			
+									</div>
+								</td>
+							</tr>
+						</table>
+					
+				<div class="b-comments__reply"></div>
+			
+					<!-- RELATED STORIES BLOCK -->
+					<div id="related-stories" data-id="4336666" data-count="0">
+						<div class="b-related-stories">
+				
+					<div class="rs-stories"></div>
+					<a class="rs-more-btn" target="_blank">показать ещё</a>
+				
+						<div class="b-related-stories-tags">
+							<div>Похожие посты не найдены. Возможно, вас заинтересуют другие посты по тегам:</div>
+					
+							<a href="/tag/NodeMCU/hot" style="text-decoration: none">
+								<span class="tag no_ch">NodeMCU</span>
+							</a>
+						
+							<a href="/tag/робот на NodeMCU/hot" style="text-decoration: none">
+								<span class="tag no_ch">робот на NodeMCU</span>
+							</a>
+						
+							<a href="/tag/NodeMCU L298N/hot" style="text-decoration: none">
+								<span class="tag no_ch">NodeMCU L298N</span>
+							</a>
+						
+							<a href="/tag/ESP8266 робот/hot" style="text-decoration: none">
+								<span class="tag no_ch">ESP8266 робот</span>
+							</a>
+						
+							<a href="/tag/робот NodeMCU Android/hot" style="text-decoration: none">
+								<span class="tag no_ch">робот NodeMCU Android</span>
+							</a>
+						
+						</div>
+					
+						</div>
+					</div>
+
+				
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				
+							</td>
+				        </tr>
+				    </table>
+				</td>
+			
+				    <td style="vertical-align: top" class="personal">
+				        <!--[start right menu]-->
+						<div id="right_menu" class="menu-cont">
+							<div class="header_links header-nav-top">
+								<ul class="header_links" style="margin-right: 1%">
+									<li><a href="http://pikabu.ru/tag">список тегов</a></li>
+									<li><a href="http://pikabu.ru/disputed">обсуждаемое</a></li>
+									<li><a href="http://pikabu.ru/search.php?n=16&r=3">[моё]</a></li>
+									<li><a href="http://pikabu.ru/html.php?id=faq">FAQ</a></li>
+									<li><a href="http://pikabu.ru/html.php?id=ad">реклама</a></li>
+								</ul>
+							</div>
+							<div id="serach_block" class="header-search-box">
+								<form name="form1" method="get" action="http://pikabu.ru/search.php">
+									<div>
+										<input type="text" name="q" id="search_menu" value="" class="search_block" placeholder="поиск..."><input
+											type="image" src="http://cs.pikabu.ru/images/search_btn4n.png" class="search_btn" value="">
+									</div>
+								</form>
+							</div>
+				
+				<!--[start auth block]-->
+				<div class="b-sign">
+					<div class="b-tabs b-tabs_type_sign">
+						<ul class="b-tabs__list b-tabs__list_justify_center">
+							<li class="b-tabs_li_active_yes">Авторизация</li>
+							<li>Регистрация</li>
+						</ul>
+						<div class="b-tabs__container">
+							<!-- Войти -->
+							<div class="b-tabs__tab b-tabs__tab_active_yes b-sign__in">
+								<form method="post" onsubmit="void(0);" action="javascript:void(0);">
+									<input type="hidden" name="mode" value="login">
+
+									<div class="b-group b-group_margin-bottom_10">
+										<input data-name="username" class="b-input" type="text" id="username"  autocomplete="username" maxlength="255" name="username" placeholder="логин">
+										<input data-name="password" class="b-input" type="password" id="password"  autocomplete="password" maxlength="255" name="password" placeholder="пароль">
+									</div>
+									<div class="b-sign__captcha" style="display: none"></div>
+									<div class="b-group">
+										<div class="b-sign__oauth-providers">
+											<a href="http://pikabu.ru/oauth.php?type=vk">
+												<i class="i-sprite--sign__vk i-sprite--inline-block"></i>
+											</a> <a href="http://pikabu.ru/oauth.php?type=fb">
+												<i class="i-sprite--sign__facebook i-sprite--inline-block"></i>
+											</a> <a href="http://pikabu.ru/oauth.php?type=tw">
+												<i class="i-sprite--sign__twitter i-sprite--inline-block"></i>
+											</a> <a href="http://pikabu.ru/oauth.php?type=google">
+												<i class="i-sprite--sign__google i-sprite--inline-block"></i>
+											</a>
+										</div>
+										<button type="submit" class="b-button b-button_type_default">войти</button>
+									</div>
+									<div class="b-sign__error" style="display: none">
+										<div class="b-sign__error-message">Неверный логин или пароль</div>
+										<a class="b-link b-link_type_primary" href="/restore.php">Восстановить пароль</a>
+									</div>
+								</form>
+							</div>
+							<!-- Зарегистрироватся -->
+							<div class="b-tabs__tab b-sign__up">
+								<div class="b-sign__oauth-label">Через социальную сеть</div>
+								<div class="b-sign__oauth-providers">
+									<a href="http://pikabu.ru/oauth.php?type=vk">
+										<i class="i-sprite--sign__vk i-sprite--inline-block"></i>
+									</a> <a href="http://pikabu.ru/oauth.php?type=fb">
+										<i class="i-sprite--sign__facebook i-sprite--inline-block"></i>
+									</a> <a href="http://pikabu.ru/oauth.php?type=tw">
+										<i class="i-sprite--sign__twitter i-sprite--inline-block"></i>
+									</a> <a href="http://pikabu.ru/oauth.php?type=google">
+										<i class="i-sprite--sign__google i-sprite--inline-block"></i>
+									</a>
+								</div>
+								<div class="b-sign__oauth-hr"></div>
+								<form name="form2" method="POST" action="javascript:void 0;" id="form2">
+									<span class="b-sign__validate b-sign__validate_state_error" data-name="all"></span>
+									<div>
+										<label for="signup-u">Логин
+											<span class="b-sign__validate b-sign__validate_state_error" data-name="username"></span>
+										</label>
+									</div>
+									<div>
+										<input id="signup-u" data-name="username" class="b-input" autocomplete="off" type="text" maxlength="255" value="">
+									</div>
+									<div>
+										<label for="signup-e">Email
+											<span class="b-sign__validate b-sign__validate_state_error" data-name="email"></span>
+										</label>
+									</div>
+									<div>
+										<input data-name="email" class="b-input" type="email" autocomplete="off" maxlength="255" value="">
+									</div>
+									<div class="b-sign__password">
+										<label for="signup-p">Пароль
+											<span class="b-sign__validate b-sign__validate_state_error" data-name="password"></span>
+										</label>
+
+										<div class="b-sign__password-view fa fa-eye"></div>
+										<input id="signup-p" data-name="password" class="b-input" data-additional="_jc5FfM" type="password" maxlength="255" autocomplete="off" value="">
+
+										<div class="b-password-strength">
+											<div class="b-password-strength__bar"></div>
+										</div>
+									</div>
+									<span class="b-sign__validate b-sign__validate_state_error" data-name="g-recaptcha-response"></span>
+									<div class="b-sign__captcha"></div>
+									<button type="submit" class="b-button b-button_type_create b-button_width_p100">Зарегистрироваться</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--[end auth block]-->
+			
+				<div class="login_f menu-add-btn">
+					<a onclick="show_reg_msg();event.preventDefault();">
+						<div class="b-button b-button_type_green">
+							<img src="http://cs.pikabu.ru/images/addbutton2014_plus.png">
+							<div id="addnews_div">добавить пост</div>
+						</div>
+					</a>
+				</div>
+			
+				<div class="login_f menu-block">
+					<table cellpadding="0">
+						<tr>
+							<td class="rating_bl menu-block-title">О сообществе</td>
+						</tr>
+						<tr style="height:10px">
+							<td class="b-community-info" data-id="129">
+								<div class="community-info">
+									<a href="/community/TECHNO_BROTHER" data-role="avatar"><img src="http://cs8.pikabu.ru/images/community/490/1479669298223917659.png" alt=""></a>
+									<a href="/community/TECHNO_BROTHER" data-role="link"><h2>TECHNO BROTHER</h2></a><br>
+									<span>
+										<span data-role="stories_cnt" data-value="366">366 постов</span>
+										<b>&bull;</b>
+										<span data-role="subs_cnt" data-value="4305">4305 подписчиков</span>
+									</span>
+								</div>
+
+			
+				<div class="community-buttons">
+					<div class="community-subs" >
+						<a class="b-button b-button_type_green"  href="javascript: void(0)" data-role="subs+">подписаться</a>
+						<a class="b-button b-button_type_green" style="display: none" href="javascript: void(0)" data-role="subs-">отписаться</a>
+					</div>
+			
+					<a href="javascript: void(0)"  data-role="ignore+">добавить в игнор-лист</a>
+					<a href="javascript: void(0)" style="display: none" data-role="ignore-">убрать из игнор-листа</a>
+				
+				</div>
+			
+					<div class="community-desc"><p>Соообщество (Техно-братство) радиолюбителей, мастеров по ремонтам, и просто любителей электроники на Пикабу <b><br></b></p><p>При создании новой темы давайте ей осмысленное название. Оно должно отражать суть вашего поста.</p>Все посты в сообщество проходят модерацию Разрешена публикация постов по тематикам сообщества.<p><br></p><p><b>Тематики нашего сообщества:</b> <b>1</b> - Техника <b>2</b> - Гаджеты <b>3</b> - Радиолюбители <b>4</b> - Сделай Сам (самодельная электроника) <b>5</b> - Ремонты техники, гаджетов, электроники <b>6</b> - Уроки по радиоделу, электронике, основы электроники <b>7</b> - Новости из мира техники, электроники, гаджетов <b>8</b> - Коллекционирование гаджетов, электроники, техники <b>9</b> - Обзоры: </p><p><i><b>9.1</b></i> - гаджеты <i><b>9.2</b></i> - технику <i><b>9</b><b>.3</b></i> - электронику <i><b>9.4</b></i> - OldStuff - старые гаджеты, электроника и техника <b>10 - </b>Покупки электроники и запчастей из Китая <b>11 - </b>Моддинг <b>12 - </b>Обсуждение ремонтов, моддинга, самодельных подделок <b>13 -</b> Помощь новичкам в ремонтах, создании, прошивке электроники</p><p><br></p><p>Всем добра и печенюх. Будьте добры друг к другу.<br></p></div>
+				
+				<div class="b-community-statuses">
+					
+					
+					<div><a href="/community_banlist.php?name=TECHNO_BROTHER">Игнор-лист сообщества</a></div>
+				</div>
+			
+					<div class="community-rules">
+						<section>Правила сообщества</section>
+						<p><b>1-</b>Мы А-политическое сообщество. 
+<b>2-</b>Запрещено оскорбление: Администрации Пикабу, сообщества, участников сообщества а также родных, близких выше указанных.<br></p><p><b>3</b>-Категорически запрещается разжигание межнациональной розни или действий, направленных на возбуждение национальной, расовой вражды, унижение национального достоинства, а также высказывания о превосходстве либо неполноценности пользователей по признаку их отношения к национальной принадлежности или политических взглядов.
+<b>Мат - Нежелателен. Учитесь выражать мысли без матерщины</b></p>
+					</div>
+				
+				<div class="community-owner">
+					<section>Администратор и модераторы</section>
+			
+					<a class="community-user" href="/profile/Dionisnation"><img src="http://cs6.pikabu.ru/images/avatars/489/m489647-204298467.jpg"> Dionisnation</a>
+					<span>07 Июня 2016</span>
+					<br>
+				
+						<a class="community-user community-moderator" href="/profile/DanteGeek"><img src="http://cs.pikabu.ru/images/def_avatar/def_avatar_48.png"> DanteGeek</a>
+					
+				</div>
+			
+							</td>
+						</tr>
+					</table>
+				</div>
+			
+						<div class="login_f menu-block-branding">
+					
+					<a href="http://pikabu.ru/story/t_rkol_gl_maikhniemyaonomu_seyla_stakamvmemu__4712955" target="_blank">
+						<div id="branding_ad_comment" title="" style="
+								width: 300px;
+								height: 100px;
+								border-radius: 3px 3px 0 0;
+								background: url('http://cs9.pikabu.ru/post_img/2017/04/28/9/149339483265427229.jpg');
+								border-bottom: 1px dashed;
+								border-bottom-color: #777;
+								display: block !important;
+    							visibility: visible !important;
+							" onclick="yaCounter174977.reachGoal('branding_click', {position: 'Комментарий'}); return true;">
+						</div>
+					</a>
+				
+					<table cellspacing="0" class="best_comm">
+						<tr>
+							<td class="rating_bl menu-block-title">
+								<div>
+									Комментарий дня
+									<span class="menu-block-title-right">
+										<a href="http://pikabu.ru/top50_comm.php">ТОП 50</a>
+									</span>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="menu-best-comm">
+				
+				<div class="menu-story-link">
+					<a href="http://pikabu.ru/story/novosti_iz_sanktpeterburga_5022402">Новости из Санкт-Петербурга</a>
+				</div>
+				<div class="info info_c menu-comm-head">
+                    <h6>+1943</h6>&nbsp;
+                    <a href="http://pikabu.ru/profile/Shvdmitry">Shvdmitry</a>; <a style="text-decoration: none;"
+                        class="detailDate" href="javascript:void(0)" title="1493743644">19 часов назад</a>
+                    <a href="http://pikabu.ru/story/novosti_iz_sanktpeterburga_5022402#comment_86636475" title="ссылка на данный комментарий">#</a>
+				</div>
+                <div class="comment_msg comment_desc menu-comm-desc">
+					
+				<div class="b-comment-best" data-overflow="0">
+					<p>Бедный Милонов.</p>
+				</div>
+			
+                </div>
+			
+								</td>
+							</tr>
+						</table>
+					</div>
+				
+				<table border="0" cellspacing="0" cellpadding="0" style="width: 300px; margin: 15px 0 0 5px; padding: 0px; text-align: center">
+					<tr width="100%">
+					<td style="width: auto; font-size: 13px; text-align: center">
+			
+					<!-- R-56459-35 Яндекс.RTB-блок  -->
+					<div id="yandex_ad_R-56459-35_1"></div>
+					<script type="text/javascript">
+						(function(w, d, n, s, t) {
+							w[n] = w[n] || [];
+							w[n].push(function() {
+								Ya.Context.AdvManager.render({
+									blockId: "R-56459-35",
+									renderTo: "yandex_ad_R-56459-35_1",
+									pageNumber: 1,
+									async: true
+								});
+							});
+							t = d.getElementsByTagName("script")[0];
+							s = d.createElement("script");
+							s.type = "text/javascript";
+							s.src = "//an.yandex.ru/system/context.js";
+							s.async = true;
+							t.parentNode.insertBefore(s, t);
+						})(this, this.document, "yandexContextAsyncCallbacks");
+					</script>
+				
+						<div id="facebook_page_block" style="display: none"></div>
+						<script src="http://cs.pikabu.ru/files/advert.js"></script>
+			
+					<script>
+						if (!("ab" in window)) { window.ab = true; }
+						var result = document.getElementById("facebook_page_block");
+						if (window.ab == true) {
+							document.getElementById("facebook_page_block").style.display = "block";
+							result.innerHTML = '<a href="/community/pikabushniki_vezde" target="_blank">\
+							    <img src="http://cs.pikabu.ru/images/communities_v4/pikabushniki_vezde.jpg" title="Жизнь пикабушников за границей" alt="Жизнь пикабушников за границей" \
+							    style="border: none; width: 300px; height: 250px; background-color: white;">\
+							    </a>';
+						}
+					</script>
+				
+					</td>
+					</tr>
+				</table>
+			
+					<div class="right_menu_ads">
+				
+				<div class="story__gag story__gag_relative">
+					<div id="yandex_ad_1493812076_76907" data-ad="yandex_ctx_menu"></div>
+				</div>
+				<script type="text/javascript">
+					(function(w, d, n, s, t) {
+						w[n] = w[n] || [];
+						w[n].push(function() {
+							Ya.Direct.insertInto(
+								56459,
+								"yandex_ad_1493812076_76907",
+								{"site_charset":"windows-1251","stat_id":"3","ad_format":"direct","font_size":1,"font_family":"tahoma","type":"posterVertical","border_type":"block","limit":2,"title_font_size":3,"site_bg_color":"FFFFFF","header_bg_color":"FFFFFF","bg_color":"FFFFFF","title_color":"5190B8","url_color":"008900","text_color":"676767","sitelinks_color":"777777","hover_color":"5190B8","border_color":"D7D7D7","favicon":true,"no_sitelinks":false}
+							);
+						});
+						t = d.documentElement.firstChild;
+						s = d.createElement("script");
+						s.type = "text/javascript";
+						s.src = "http://an.yandex.ru/system/context.js";
+						s.setAttribute("async", "true");
+						t.insertBefore(s, t.firstChild);
+					})(window, document, "yandex_context_callbacks");
+				</script>
+			
+					</div>
+				
+					<div class="login_f menu-top-tags">
+						<table cellpadding="0">
+							<tr>
+								<td class="rating_bl b-community-top-caption">
+									Активные сообщества
+									<i class="fa fa-question-circle" data-content-html="
+					Список активных сообществ обновляется каждый час.&lt;br&gt;
+					&lt;br&gt;
+					Положительные факторы, влияющие на позицию в рейтинге:&lt;br&gt;
+					&amp;bull; количество постов за сутки&lt;br&gt;
+					&amp;bull; общий рейтинг суточных постов&lt;br&gt;
+					&lt;br&gt;
+					Отрицательный фактор:&lt;br&gt;
+					&amp;bull; количество пользователей, добавивших сообщество в игнор-лист
+				" aria-hidden="true"></i>
+								</td>
+							</tr>
+							<tr>
+								<td class="menu-top-tags-cont">
+				
+						<div class="b-community-line">
+							<a href="/community/science">
+								<img src="http://cs9.pikabu.ru/images/community/1353/1492387714299723775.png" alt="">
+								<span class="b-community-line__name">Наука | Science</span>
+					
+							</a>
+						</div>
+					
+						<div class="b-community-line">
+							<a href="/community/true_story">
+								<img src="http://cs8.pikabu.ru/images/community/1068/1480601857290150095.png" alt="">
+								<span class="b-community-line__name">Истории из жизни</span>
+					
+							</a>
+						</div>
+					
+						<div class="b-community-line">
+							<a href="/community/hand_made">
+								<img src="http://cs9.pikabu.ru/images/community/351/1492514800248179851.png" alt="">
+								<span class="b-community-line__name">Рукодельники</span>
+					
+							</a>
+						</div>
+					
+						<div class="b-community-line">
+							<a href="/community/Ligaleni">
+								<img src="http://cs8.pikabu.ru/images/community/666/1481621516262656611.png" alt="">
+								<span class="b-community-line__name">Лига лени</span>
+					<span class="b-community-line__up"><i class="fa fa-long-arrow-up" aria-hidden="true"></i>1</span>
+							</a>
+						</div>
+					
+						<div class="b-community-line">
+							<a href="/community/justice">
+								<img src="http://cs8.pikabu.ru/images/community/440/1488897790217283946.png" alt="">
+								<span class="b-community-line__name">Лига Юристов</span>
+					<span class="b-community-line__down"><i class="fa fa-long-arrow-down" aria-hidden="true"></i>1</span>
+							</a>
+						</div>
+					
+						<div class="b-community-line">
+							<a href="/community/shutup_take_my_money">
+								<img src="http://cs8.pikabu.ru/images/community/1443/149152896926187229.png" alt="">
+								<span class="b-community-line__name">Заткнись и возьми мои деньги</span>
+					<span class="b-community-line__up"><i class="fa fa-long-arrow-up" aria-hidden="true"></i>3</span>
+							</a>
+						</div>
+					
+						<div class="b-community-line">
+							<a href="/community/novosti">
+								<img src="http://cs8.pikabu.ru/images/community/506/1470656486293795641.png" alt="">
+								<span class="b-community-line__name">Новости</span>
+					<span class="b-community-line__up"><i class="fa fa-long-arrow-up" aria-hidden="true"></i>1</span>
+							</a>
+						</div>
+					
+						<div class="b-community-line">
+							<a href="/community/gamers">
+								<img src="http://cs8.pikabu.ru/images/community/84/1492860759271938904.png" alt="">
+								<span class="b-community-line__name">Лига Геймеров</span>
+					<span class="b-community-line__down"><i class="fa fa-long-arrow-down" aria-hidden="true"></i>2</span>
+							</a>
+						</div>
+					
+						<div class="b-community-line">
+							<a href="/community/photographers">
+								<img src="http://cs9.pikabu.ru/images/community/266/1486562432232165481.png" alt="">
+								<span class="b-community-line__name">Лига фотографов</span>
+					
+							</a>
+						</div>
+					
+						<div class="b-community-line">
+							<a href="/community/books">
+								<img src="http://cs9.pikabu.ru/images/community/736/1492263327286477829.png" alt="">
+								<span class="b-community-line__name">Книжная лига</span>
+					
+							</a>
+						</div>
+					
+							</td>
+						</tr>
+						<tr>
+							<td class="menu-top-tags-links">
+								<div class="tag_all">
+									<a href="http://pikabu.ru/communities/all">все сообщества</a>
+									<a href="http://pikabu.ru/community_edit.php">создать</a>
+								</div>
+							</td>
+						</tr>
+					</table>
+					</div>
+				
+					<div class="login_f menu-top-tags">
+						<table cellpadding="0">
+							<tr>
+								<td class="rating_bl">Тенденции</td>
+							</tr>
+				
+						<tr>
+							<td class="menu-top-tags-cont">
+					
+							<div class="allMenuTags">
+								<a class="no_ch" href="http://pikabu.ru/tag/экзамен/hot"><span
+									class="tag no_ch">экзамен</span>
+								<span class="tag_count">22</span></a>
+							</div>
+						
+							<div class="allMenuTags">
+								<a class="no_ch" href="http://pikabu.ru/tag/90-е/hot"><span
+									class="tag no_ch">90-е</span>
+								<span class="tag_count">20</span></a>
+							</div>
+						
+							<div class="allMenuTags">
+								<a class="no_ch" href="http://pikabu.ru/tag/свадьба/hot"><span
+									class="tag no_ch">свадьба</span>
+								<span class="tag_count">19</span></a>
+							</div>
+						
+							<div class="allMenuTags">
+								<a class="no_ch" href="http://pikabu.ru/tag/одесса/hot"><span
+									class="tag no_ch">одесса</span>
+								<span class="tag_count">9</span></a>
+							</div>
+						
+							<div class="allMenuTags">
+								<a class="no_ch" href="http://pikabu.ru/tag/детство 90-х/hot"><span
+									class="tag no_ch">детство 90-х</span>
+								<span class="tag_count">8</span></a>
+							</div>
+						
+							</td>
+						</tr>
+						<tr>
+							<td class="menu-top-tags-links">
+								<div class="tag_all">
+									<a href="http://pikabu.ru/tag" style="margin-right: 10px;">все теги</a>
+									<a href="http://pikabu.ru/tags_merge">объединение тегов</a>
+								</div>
+							</td>
+						</tr>
+					
+						</table>
+					</div>
+				
+				<div style="overflow: hidden; margin-top: 10px; margin-left: 17px;">
+			
+					<!-- R-56459-21 Яндекс.RTB-блок  -->
+					<div id="yandex_ad_R-56459-21_1"></div>
+					<script type="text/javascript">
+						(function(w, d, n, s, t) {
+							w[n] = w[n] || [];
+							w[n].push(function() {
+								Ya.Context.AdvManager.render({
+									blockId: "R-56459-21",
+									renderTo: "yandex_ad_R-56459-21_1",
+									pageNumber: 1,
+									async: true
+								});
+							});
+							t = d.getElementsByTagName("script")[0];
+							s = d.createElement("script");
+							s.type = "text/javascript";
+							s.src = "//an.yandex.ru/system/context.js";
+							s.async = true;
+							t.parentNode.insertBefore(s, t);
+						})(this, this.document, "yandexContextAsyncCallbacks");
+					</script>
+				
+				</div>
+			<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-28292940-1']);
+  _gaq.push(['_setDomainName', 'pikabu.ru']);
+  _gaq.push(['_setAllowLinker', true]);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+
+				<br><br><br><br><br><br><br><br><br><br><br><br>
+			
+						<!--[end right menu]-->
+						</div>
+						</td>
+						</tr>
+				
+					</table>
+					<br><br>
+				</div>
+			
+				<noindex>
+					<div id="unreg_message" class="header-message-signup">
+						Пожалуйста, <a href="#login_block_btn_enter" class="gotoLoginForm" id="showLogForm">войдите</a>
+						в аккаунт или <a href="#login_block_btn_enter" class="gotoLoginForm" id="showRegForm">зарегистрируйтесь</a>
+					</div>
+					<div id="error_message" class="header-message-err"></div>
+				</noindex>
+			
+				<table class="footer_links footer-table">
+					<tr>
+					<td id="footer_links_td" class="footer-links">
+						<img src="http://cs.pikabu.ru/images/rss.png"><a href="http://pikabu.ru/xmlfeeds.php?cmd=popular">RSS</a>
+
+						<span>&nbsp;</span>
+						<a href="http://m.pikabu.ru">Мобильная версия</a>
+
+						<span>&nbsp;</span>
+						<a href="http://pikabu.ru/html.php?id=wtf">Правила</a>
+
+						<span>&nbsp;</span>
+						<a href="http://pikabu.ru/html.php?id=faq">FAQ</a>
+
+						<noindex>
+							<span>&nbsp;</span>
+							<a href="http://pikabu.ru/banned_users.php" rel="nofollow">Бан</a>
+						</noindex>
+
+						<span>&nbsp;</span>
+						<a href="http://pikabu.ru/html.php?id=ad">Реклама</a>
+						
+						<span>&nbsp;</span>
+						<a href="https://play.google.com/store/apps/details?id=ru.pikabu.android&referrer=utm_source%3Ddv-footer-post">Пикабу на Android</a>
+					</td>
+					</tr>
+				</table>
+
+				<table class="footer_links2 footer-table">
+					<tr>
+					<td class="footer-links" id="footer_links_td" style="width: 67%">
+						Партнеры: <img src="http://cs.pikabu.ru/images/partners/blackbears.png">
+						<noindex><a href="https://vk.com/blackbearsmobi" target="_blank" rel="nofollow">BlackBears</a></noindex>
+					</td>
+					<td style="width: 15%"></td>
+					<td style="width: 17%">
+						<div class="footer-fornex">
+							<noindex>
+								<span>Хостинг:</span>
+								<a href="http://fornex.com/" target="_blank" rel="nofollow">Fornex.com</a>
+							</noindex>
+						</div>
+					</td>
+					</tr>
+				</table>
+
+				<table class="footer footer-table footer-table-bottom"  style="color: black">
+					<tr  style="color: black">
+					<td class="copy" style="width: 70%; line-height: 1.3;">
+						<div class="footer-social">
+							<span><img src="http://cs.pikabu.ru/images/vk_pikabu.png"> <a href="http://vk.com/pikabu" target="_blank"  style="color: black">Вконтакте</a></span>
+							<span style="margin-left:10px"><img src="http://cs.pikabu.ru/images/fb_3.png"> <a href="https://www.facebook.com/pikabu.ru" target="_blank"  style="color: black">Facebook</a></span>
+							<span style="margin-left:10px"><img src="http://cs.pikabu.ru/images/telegram_footer.png"> <a href="https://telegram.me/pikabu_ru" target="_blank"  style="color: black">Telegram</a></span>
+							<!-- <span style="margin-left:10px"><img src="http://cs.pikabu.ru/images/tw_3.png"> <a href="https://twitter.com/pikabu_vk" target="_blank"  style="color: black">Twitter</a></span> -->
+						</div>
+						<div class="footer-contact">
+							<div>
+  								По вопросам работы сайта: <a href="mailto:admin@pikabu.ru">admin@pikabu.ru</a><br>
+  								<a href="http://pikabu.ru/community/feature_request" style="color: inherit;">Внести предложение</a><br>
+  								<br>
+  							</div>
+							<div>
+								Служба поддержки: <a href="mailto:support@pikabu.ru">support@pikabu.ru</a><br>
+  								<a href="http://pikabu.ru/community/bugreports" style="color: inherit;">Сообщить об ошибке</a><br>
+  								<br> 						
+  							</div>
+  							<div>
+  								По вопросам <a href="http://pikabu.ru/html.php?id=ad" style="color: inherit;">рекламы</a>: <a href="mailto:ads@pikabu.ru">ads@pikabu.ru</a>
+  							</div>
+						</div>
+					</td>
+
+					<td class="copy counter" style="width: 15%">
+						<div class="footer-counter-liveinternet">
+							<noindex>
+							
+							<!--LiveInternet counter--><script type="text/javascript"><!--
+								new Image().src = "//counter.yadro.ru/hit;Pikabu?r"+
+								escape(document.referrer)+((typeof(screen)=="undefined")?"":
+								";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
+								screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
+								";"+Math.random();//--></script><!--/LiveInternet-->
+							</noindex>
+							<!--LiveInternet logo-->
+								<a href="http://www.liveinternet.ru/click;Pikabu" target="_blank">
+									<img src="//counter.yadro.ru/logo;Pikabu?17.2" title="LiveInternet: показано число просмотров за 24 часа, посетителей за 24 часа и за сегодня" alt="" border="0" width="88" height="31">
+								</a>
+							<!--/LiveInternet-->
+							
+						</div>
+					</td>
+					<td class="copy" style="width: 15%">
+						<noindex>
+						<div>
+							<div class="footer-pechenka">
+								<div id="brovdiv">
+				<a href="http://pikabu.ru/story/_4068384">
+					<img id="brov" style="" src="http://cs.pikabu.ru/images/fun/EPICnickname_gb.png"
+						title="Печенюх [by EPICnickname]">
+				</a>
+			</div>
+							</div>
+
+							<!-- Yandex.Metrika counter -->
+							<script type="text/javascript">
+								(function (d, w, c) {
+								    (w[c] = w[c] || []).push(function() {
+								        try {
+								            w.yaCounter174977 = new Ya.Metrika({id:174977});
+								        } catch(e) { }
+								    });
+
+								    var n = d.getElementsByTagName("script")[0],
+								        s = d.createElement("script"),
+								        f = function () { n.parentNode.insertBefore(s, n); };
+								    s.type = "text/javascript";
+								    s.async = true;
+								    s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js";
+
+								    if (w.opera == "[object Opera]") {
+								        d.addEventListener("DOMContentLoaded", f, false);
+								    } else { f(); }
+								})(document, window, "yandex_metrika_callbacks");
+							</script>
+							<noscript>
+								<div><img src="//mc.yandex.ru/watch/174977" style="position:absolute; left:-9999px;" alt="" /></div>
+							</noscript>
+							<!-- /Yandex.Metrika counter -->
+			
+
+						</div>
+						<div style="visibility: hidden">
+							<script type="text/javascript">
+								(window.Image ? (new Image()) : document.createElement("img")).src = location.protocol
+									+ "//vk.com/rtrg?r=y5YLGMdFGMussDQo9RKwt0ZXBhlVHz9Wk1keHFw1GGi6umhFgCHTD4vYUnpy9t2guau7nCXi4p4lZy6g4RVVeaj0ksWvpbGL8xl53mDcbKBtPgigBg/8OUM2g6lhNPstAMipZiDFYJpEV0LDXYgKucnNBBRu3QHNQbNNZnE/Zmg-";
+							</script>
+						</div>
+						</noindex>
+					</td>
+					</tr>
+				</table>
+			
+					<a href="http://pikabu.ru/story/t_rkol_gl_maikhniemyaonomu_seyla_stakamvmemu__4712955" target="_blank">
+						<div id="branding_ad_footer" title="" style="
+								background: url('http://cs9.pikabu.ru/post_img/2017/04/28/9/14933948276781259.jpg') no-repeat center;
+								background-color: #111139;
+								width: 100%;
+								height: 285px;
+								margin-top: -93px;
+								display: block !important;
+    							visibility: visible !important;
+							" onclick="yaCounter174977.reachGoal('branding_click', {position: 'Футер'}); return true;">
+						</div>
+					</a>
+				
+				<div style="display:none" id="comment_7117755">
+				    <div class="b-comment__body">
+				        <span style="color: rgb(136, 136, 136)"></span>
+				    </div>
+				    <div class="b-comment__controls"></div>
+				</div>
+			
+				</body>
+				</html>
+			
