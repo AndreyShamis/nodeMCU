@@ -16,11 +16,7 @@ extern "C" {
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_ADXL345_U.h>
-#include <Adafruit_HMC5883_U.h>
-#include <ESP8266WiFi.h>
-
+#include <ESP8266WiFi.h> 
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
@@ -58,12 +54,6 @@ ESP8266WebServer    server(80);
 DeviceAddress       insideThermometer; // arrays to hold device address
 WiFiUDP ntpUDP;
 
-// SDA connect D2
-// SCL connect to D1
-
-/* Assign a unique ID to this sensor at the same time */
-Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
-Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12346);
 
 // You can specify the time server pool and the offset (in seconds, can be
 // changed later with setTimeOffset() ). Additionaly you can specify the
@@ -285,40 +275,6 @@ void setup(void) {
   timeClient.begin();
   timeClient.update();
 
-
-  /* Initialise the sensor */
-  if (!mag.begin())
-  {
-    /* There was a problem detecting the HMC5883 ... check your connections */
-    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
-    while (1);
-  }
-
-  /* Initialise the sensor */
-  if (!accel.begin())
-  {
-    /* There was a problem detecting the ADXL345 ... check your connections */
-    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
-  }
-
-  /* Set the range to whatever is appropriate for your project */
-  accel.setRange(ADXL345_RANGE_16_G);
-  // displaySetRange(ADXL345_RANGE_8_G);
-  // displaySetRange(ADXL345_RANGE_4_G);
-  // displaySetRange(ADXL345_RANGE_2_G);
-
-  /* Display some basic information on this sensor */
-  sensor_t sensor;
-  
-  accel.getSensor(&sensor);
-  displaySensorDetails(sensor);
-  
-  mag.getSensor(&sensor);
-  displaySensorDetails(sensor);
-  /* Display additional settings (outside the scope of sensor_t) */
-  displayDataRate();
-  displayRange();
-  Serial.println("");
 }
 
 /**
@@ -406,62 +362,7 @@ void loop(void) {
     //Serial.println(timeClient.getEpochTime());
 
   }
-  if (counter % 1 == 0) {
-    /* Get a new sensor event */
-    sensors_event_t event;
 
-    mag.getEvent(&event);
-    /* Display the results (magnetic vector values are in micro-Tesla (uT)) */
-    Serial.print("MAGNETIC X: "); Serial.print(event.magnetic.x); Serial.print("  ");
-    Serial.print("Y: "); Serial.print(event.magnetic.y); Serial.print("  ");
-    Serial.print("Z: "); Serial.print(event.magnetic.z); Serial.print("  "); Serial.println("uT");
-
-    // Hold the module so that Z is pointing 'up' and you can measure the heading with x&y
-    // Calculate heading when the magnetometer is level, then correct for signs of axis.
-    float heading = atan2(event.magnetic.y, event.magnetic.x);
-
-    // Once you have your heading, you must then add your 'Declination Angle', which is the 'Error' of the magnetic field in your location.
-    // Find yours here: http://www.magnetic-declination.com/
-    // Mine is: -13* 2' W, which is ~13 Degrees, or (which we need) 0.22 radians
-    // If you cannot find your Declination, comment out these two lines, your compass will be slightly off.
-    float declinationAngle = 0.22;
-    heading += declinationAngle;
-
-    // Correct for when signs are reversed.
-    if (heading < 0)
-      heading += 2 * PI;
-
-    // Check for wrap due to addition of declination.
-    if (heading > 2 * PI)
-      heading -= 2 * PI;
-
-    // Convert radians to degrees for readability.
-    float headingDegrees = heading * 180 / M_PI;
-
-    Serial.print("Heading (degrees): "); Serial.println(headingDegrees);
-
-    accel.getEvent(&event);
-
-    /* Display the results (acceleration is measured in m/s^2) */
-    Serial.print("ACCELERATION X: "); Serial.print(event.acceleration.x); Serial.print("  ");
-    Serial.print("Y: "); Serial.print(event.acceleration.y); Serial.print("  ");
-    Serial.print("Z: "); Serial.print(event.acceleration.z); Serial.print("  "); Serial.println("m/s^2 ");
-
-    //        /* Display the results (acceleration is measured in m/s^2) */
-    //    Serial.print("magnetic X: "); Serial.print(event.magnetic.x); Serial.print("  ");
-    //    Serial.print("Y: "); Serial.print(event.magnetic.y); Serial.print("  ");
-    //    Serial.print("Z: "); Serial.print(event.magnetic.z); Serial.print("  "); Serial.println("m/s^2 ");
-
-    //    /* Display the results (acceleration is measured in m/s^2) */
-    //    Serial.print("orientation ROLL: "); Serial.print(event.orientation.roll); Serial.print("  ");
-    //    Serial.print("PITCH: "); Serial.print(event.orientation.pitch); Serial.print("  ");
-    //    Serial.print("HEADING: "); Serial.print(event.orientation.heading); Serial.print("  "); Serial.println("");
-
-    //                /* Display the results (acceleration is measured in m/s^2) */
-    //    Serial.print("gyro X: "); Serial.print(event.gyro.x); Serial.print("  ");
-    //    Serial.print("Y: "); Serial.print(event.gyro.y); Serial.print("  ");
-    //    Serial.print("Z: "); Serial.print(event.gyro.z); Serial.print("  "); Serial.println("m/s^2 ");
-  }
 }
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -599,105 +500,4 @@ void processSyncMessage() {
     }
   }
 }
-/**
-   Adafruit_ADXL345
-*/
-void displaySensorDetails(sensor_t sensor)
-{
-
-  Serial.println("------------------------------------");
-  Serial.println  ("Sensor:       " + String(sensor.name));
-  Serial.println  ("Driver Ver:   " + sensor.version);
-  Serial.println  ("Unique ID:    " + sensor.sensor_id);
-  Serial.println  ("Max Value:    " + String(sensor.max_value) + " m/s^2");
-  Serial.println  ("Min Value:    " + String(sensor.min_value) + " m/s^2");
-  Serial.println  ("Resolution:   " + String(sensor.resolution) + " m/s^2");
-  Serial.println("------------------------------------\n");
-}
-
-void displayDataRate(void)
-{
-
-  String data_rate = "";
-  switch (accel.getDataRate())
-  {
-    case ADXL345_DATARATE_3200_HZ:
-      data_rate = "3200";
-      break;
-    case ADXL345_DATARATE_1600_HZ:
-      data_rate = "1600";
-      break;
-    case ADXL345_DATARATE_800_HZ:
-      data_rate = "800";
-      break;
-    case ADXL345_DATARATE_400_HZ:
-      data_rate = "400";
-      break;
-    case ADXL345_DATARATE_200_HZ:
-      data_rate = "200";
-      break;
-    case ADXL345_DATARATE_100_HZ:
-      data_rate = "100";
-      break;
-    case ADXL345_DATARATE_50_HZ:
-      data_rate = "50";
-      break;
-    case ADXL345_DATARATE_25_HZ:
-      data_rate = "25";
-      break;
-    case ADXL345_DATARATE_12_5_HZ:
-      data_rate = "12.5";
-      break;
-    case ADXL345_DATARATE_6_25HZ:
-      data_rate = "6.25";
-      break;
-    case ADXL345_DATARATE_3_13_HZ:
-      data_rate = "3.13";
-      break;
-    case ADXL345_DATARATE_1_56_HZ:
-      data_rate = "1.56";
-      break;
-    case ADXL345_DATARATE_0_78_HZ:
-      data_rate = "0.78";
-      break;
-    case ADXL345_DATARATE_0_39_HZ:
-      data_rate = "0.39";
-      break;
-    case ADXL345_DATARATE_0_20_HZ:
-      data_rate = "0.20";
-      break;
-    case ADXL345_DATARATE_0_10_HZ:
-      data_rate = "0.10";
-      break;
-    default:
-      data_rate = "???";
-      break;
-  }
-  Serial.println("Data Rate:  " + data_rate + " Hz");
-}
-
-void displayRange(void)
-{
-  String val = "";
-  switch (accel.getRange())
-  {
-    case ADXL345_RANGE_16_G:
-      val = "16";
-      break;
-    case ADXL345_RANGE_8_G:
-      val = "8";
-      break;
-    case ADXL345_RANGE_4_G:
-      val = "4";
-      break;
-    case ADXL345_RANGE_2_G:
-      val = "2";
-      break;
-    default:
-      val = "???";
-      break;
-  }
-  Serial.println("Range:  +/- " + val + " g");
-}
-
 
