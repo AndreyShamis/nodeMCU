@@ -8,11 +8,6 @@ extern "C" {
 #include "cont.h"
 }
 #include <Time.h>
-#define __LED_MATRIX
-
-#ifdef __LED_MATRIX
-#include <LedMatrix.h>
-#endif
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include <Wire.h>
@@ -59,11 +54,6 @@ WiFiUDP ntpUDP;
 // changed later with setTimeOffset() ). Additionaly you can specify the
 // update interval (in milliseconds, can be changed using setUpdateInterval() ).
 NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 10800, 60000);
-
-
-#ifdef __LED_MATRIX
-LedMatrix ledMatrix = LedMatrix(NUMBER_OF_DEVICES, CS_PIN);
-#endif
 
 BoilerModeType boilerMode = MANUAL;
 //enum ADCMode {
@@ -193,12 +183,6 @@ void setup(void) {
   Serial.begin(115200);
   Serial.println("");
   Serial.println("PASS: Serial communication started.");
-#ifdef __LED_MATRIX
-  ledMatrix.init();
-  //ledMatrix.setTextAlignment(TEXT_ALIGN_RIGHT);
-  ledMatrix.setIntensity(3); // range is 0-15
-  ledMatrix.setText(" AnDrEy ");
-#endif
   Serial.println("INFO: Starting SPIFFS...");
   SPIFFS.begin();
   Serial.println("PASS: SPIFFS startted.");
@@ -310,9 +294,6 @@ void loop(void) {
   }
 
   if (counter > 1000) {
-#ifdef __LED_MATRIX
-    ledMatrix.setNextText(String(getTemperature()) + " C");
-#endif
     counter = 0;
     printTemperatureToSerial();
   }
@@ -335,14 +316,7 @@ void loop(void) {
     Serial.println("WIFI DISCONNECTED");
     delay(500);
   }
-#ifdef __LED_MATRIX
-  ledMatrix.clear();
 
-  ledMatrix.scrollTextLeft();
-  //ledMatrix.scrollTextRight();
-  ledMatrix.drawText();
-  ledMatrix.commit(); // commit transfers the byte buffer to the displays
-#endif
   //ESP.deepSleep(sleepTimeS * 1000000, RF_DEFAULT);
   delay(100);
   counter++;
@@ -360,7 +334,6 @@ void loop(void) {
 
     Serial.println(timeClient.getFormattedTime());
     //Serial.println(timeClient.getEpochTime());
-
   }
 
 }
