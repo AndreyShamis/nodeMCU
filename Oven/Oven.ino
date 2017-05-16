@@ -3,6 +3,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
+#include <math.h>
 // #define _delay_ms(ms) delayMicroseconds((ms) * 1000)
 #define ESP8266
 #include <max6675.h>
@@ -32,8 +33,14 @@ void setup() {
 void loop() {
   // basic readout test, just print the current temp
 
-  Serial.print("C = ");
+  Serial.print("[-0.8]C = Round ");
+  Serial.print(round(thermocouple.readCelsius() - 0.8));
+  Serial.print("   . Not Round ");
   Serial.println(thermocouple.readCelsius() - 0.8);
+    Serial.print("[-0.0]C = Round ");
+  Serial.print(round(thermocouple.readCelsius() ));
+  Serial.print("   . Not Round ");
+  Serial.println(thermocouple.readCelsius() );
 //  Serial.print("F = ");
 //  Serial.println(thermocouple.readFahrenheit());
 
