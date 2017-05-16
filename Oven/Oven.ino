@@ -7,19 +7,21 @@
 #define ESP8266
 #include <max6675.h>
 
-int thermoDO    = 4;
-int thermoCS    = 5;
-int thermoCLK   = 6;
+#define thermoDO    D6 //4;
+#define thermoCS    D7 //5;
+#define thermoCLK   D5 //6;
 
 MAX6675 thermocouple(thermoCLK, thermoCS, thermoDO);
-int vccPin = 3;
-int gndPin = 2;
+//int vccPin = 3;
+//int gndPin = 2;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
+  Serial.println("");
+  Serial.println("PASS: Serial communication started.");
   // use Arduino pins
-  pinMode(vccPin, OUTPUT); digitalWrite(vccPin, HIGH);
-  pinMode(gndPin, OUTPUT); digitalWrite(gndPin, LOW);
+//  pinMode(vccPin, OUTPUT); digitalWrite(vccPin, HIGH);
+//  pinMode(gndPin, OUTPUT); digitalWrite(gndPin, LOW);
 
   Serial.println("MAX6675 test");
   // wait for MAX chip to stabilize
@@ -31,8 +33,8 @@ void loop() {
 
   Serial.print("C = ");
   Serial.println(thermocouple.readCelsius());
-  Serial.print("F = ");
-  Serial.println(thermocouple.readFahrenheit());
+//  Serial.print("F = ");
+//  Serial.println(thermocouple.readFahrenheit());
 
   delay(1000);
 }
