@@ -25,6 +25,7 @@ void setup() {
 
   Serial.println("MAX6675 test");
   // wait for MAX chip to stabilize
+  
   delay(500);
 }
 
@@ -32,7 +33,7 @@ void loop() {
   // basic readout test, just print the current temp
 
   Serial.print("C = ");
-  Serial.println(thermocouple.readCelsius());
+  Serial.println(thermocouple.readCelsius() - 0.8);
 //  Serial.print("F = ");
 //  Serial.println(thermocouple.readFahrenheit());
 
