@@ -5,7 +5,9 @@
 
 
 #define servoPin  D7  // Declare the Servo pin
-
+#define ADC       A0  // select the input pin for the potentiometer
+int X = 0;
+int Y = 0;
 const char *form = "<center><form action='/'>"
                    "<button name='dir' style='font-size:72px' type='submit' value='4'>Forward</button><br/>&nbsp;&nbsp;"
                    "<button name='dir' style='font-size:62px' type='submit' value='1'>Left</button>&nbsp;&nbsp;"
@@ -20,6 +22,26 @@ const char *form = "<center><form action='/'>"
 
 ESP8266WebServer server(80);
 Servo Servo1;  // Create a servo object
+
+void read_adc() {
+
+  // put your main code here, to run repeatedly:
+  //  digitalWrite(X_CTRL, HIGH);
+  //  delay(1);
+  //  //digitalWrite(Y_CTRL, LOW);
+  X = analogRead(ADC);
+  //int x_servo =  map(X, 0, 1024, 0, 179);
+  int x_servo =  map(X, 0, 1024, 60, 130);
+  //  digitalWrite(X_CTRL, LOW);
+  //  delay(2);
+  //  digitalWrite(Y_CTRL, HIGH);
+  //  delay(1);
+  //  Y = analogRead(ADC);
+  //  digitalWrite(Y_CTRL, LOW);
+  //  //delay(1);
+  Serial.println("X value "  + String(X) + ":" + String(x_servo));
+  Servo1.write(x_servo); // Make servo go to 90 degrees
+}
 
 /**
 
@@ -143,10 +165,20 @@ void setup() {
   Servo1.attach(servoPin); // We need to attach the servo to the used pin number
   servo_center();
 }
-
+int counter = 0;
 /**
 
 */
 void loop() {
+  counter++;
   server.handleClient();
+  if (counter % 2 == 0) {
+    read_adc();
+    delay(10);
+  }
+  if (counter > 1000) {
+    counter = 0;
+  }
+  delay(5);
+
 }
