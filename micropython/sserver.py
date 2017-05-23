@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import socket
 
 SERVER_PORT = 9090
@@ -5,7 +7,7 @@ SERVER_PORT = 9090
 sock = socket.socket()
 sock.bind(('', SERVER_PORT))
 sock.listen(1)
-sock.settimeout(1)
+#sock.settimeout(1)
 EXIT = False
 conn = None
 try:
@@ -20,7 +22,8 @@ try:
                 EXIT = True
                 break
             data = data.strip()
-            if data == "EXIT":
+            print ("Data as string " + str(data))
+            if "EXIT" in data:
                 EXIT = True
                 break
             print ("Received data:|" + str(data) + "|")
