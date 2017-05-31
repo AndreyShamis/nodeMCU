@@ -22,10 +22,8 @@
 
 */
 
-//#define BLYNK_PRINT Serial    // Prints to serial
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-#include <BlynkSimpleEsp8266.h>//Calls Blynk ESP8266 Library
 #include <Wire.h>
 #include <Adafruit_ADS1015.h>
 
@@ -40,14 +38,15 @@ int sensorValue = 0;  // variable to store the value coming from the sensor
 #define Y_CTRL    D1
 int X = 0;
 int Y = 0;
+
 void setup() {
   // declare the ledPin as an OUTPUT:
-//  pinMode(ledPin, OUTPUT);
-//  // put your setup code here, to run once:
-//  pinMode(X_CTRL, OUTPUT);
-//  pinMode(Y_CTRL, OUTPUT);
-//  digitalWrite(X_CTRL, LOW);
-//  digitalWrite(Y_CTRL, LOW);
+  //  pinMode(ledPin, OUTPUT);
+  //  // put your setup code here, to run once:
+  //  pinMode(X_CTRL, OUTPUT);
+  //  pinMode(Y_CTRL, OUTPUT);
+  //  digitalWrite(X_CTRL, LOW);
+  //  digitalWrite(Y_CTRL, LOW);
   Serial.begin(115200);
   Serial.println("");
   Serial.println("PASS: Serial communication started.");
@@ -63,7 +62,8 @@ void setup() {
   // ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
   // ads.setGain(GAIN_EIGHT);      // 8x gain   +/- 0.512V  1 bit = 0.25mV   0.015625mV
   // ads.setGain(GAIN_SIXTEEN);    // 16x gain  +/- 0.256V  1 bit = 0.125mV  0.0078125mV
-    ads.begin();
+  ads.begin();
+
 }
 
 //void read_adc() {
@@ -81,35 +81,117 @@ void setup() {
 //  digitalWrite(Y_CTRL, LOW);
 //  //delay(1);
 //
-//  
+//
 //}
+int bf_ard_middle = 0;
+int lr_ht_middle = 0;
+void calculate_moddle() {
+  int counter = 0;
+  bf_ard_middle = 0;
+  lr_ht_middle = 0;
+  for (counter = 0 ; counter < 200; counter++) {
+    delay((counter % 2) + 1);
+    bf_ard_middle += ads.readADC_SingleEnded(0);
+    delay((counter % 2) + 1);
+    lr_ht_middle += ads.readADC_SingleEnded(1);
+
+    //    if(counter < 10){
+    //      delay(counter*3);
+    //    }
+    //    else if (counter > 25){
+    //      delay(counter);
+    //    }
+    //    else{
+    //      delay(counter*2);
+    //    }
+
+  }
+  bf_ard_middle = bf_ard_middle / counter;
+  lr_ht_middle = lr_ht_middle / counter;
+  lr_ht_middle += 3;
+  bf_ard_middle += 3;
+  Serial.println("|Middle for FB" + String(bf_ard_middle) + "|");
+  Serial.println("|Middle for LR" + String(lr_ht_middle) + "|");
+}
+
+int prev_x = 0;
+int prev_y = 0;
+int16_t shure_read(int port) {
+  int counter = 0;
+  int16_t ret = 0;
+  for (counter = 0; counter < 3; counter++) {
+    int tmp = ads.readADC_SingleEnded(port);
+    if (tmp > 1200) {
+      tmp = 1;
+    }
+    if (tmp > 1090) {
+      tmp = 1100;
+    }
+    ret += tmp;
+    delay(1);
+  }
+  ret = ret / counter;
+  return ret;
+}
 
 void loop() {
-//  //digitalWrite(ledPin, HIGH);
-//  read_adc();
-//  Serial.println("INFO: sensor value X:" + String(X) + " Y:" + String(Y));
-//  delay(50);
-//  //digitalWrite(ledPin, LOW);
-//  delay(50);
-
-    int16_t adc0, adc1, adc2, adc3;
-
-  adc0 = ads.readADC_SingleEnded(0);
-  if (adc0 > 1200){
-    adc0 = 0;
+  if (lr_ht_middle == 0 || bf_ard_middle == 0) {
+    calculate_moddle();
   }
-  adc1 = ads.readADC_SingleEnded(1);
-    if (adc1 > 1200){
-    adc1 = 0;
-  }
-  adc2 = ads.readADC_SingleEnded(2);
+  //  //digitalWrite(ledPin, HIGH);
+  //  read_adc();
+  //  Serial.println("INFO: sensor value X:" + String(X) + " Y:" + String(Y));
+  //  delay(50);
+  //  //digitalWrite(ledPin, LOW);
+  //  delay(50);
+
+  int16_t adc0, adc1, adc2, adc3;
+
+  adc0 = shure_read(0);
+
+  adc1 = shure_read(1);
+
+  //adc2 = ads.readADC_SingleEnded(2);
   //adc3 = ads.readADC_SingleEnded(3);
-  Serial.print("AIN0: "); Serial.println(adc0);
-  Serial.print("AIN1: "); Serial.println(adc1);
-  Serial.print("AIN2: "); Serial.println(adc2);
-  //Serial.print("AIN3: "); Serial.println(adc3);
-  Serial.println(" ");
-  
-  delay(100);
+
+  int bf_ard = 0;
+  int lr_ht = 0;
+  int trashhold = 7;
+  if (adc0 - trashhold > bf_ard_middle) {
+    bf_ard = map(adc0, bf_ard_middle , 1100, 1, 100);
+  }
+  else if (adc0 + trashhold < bf_ard_middle) {
+    bf_ard = map(adc0, 1 , bf_ard_middle, -100, -1);
+  }
+
+  if (adc1 - trashhold > lr_ht_middle) {
+    lr_ht = map(adc1, lr_ht_middle , 1100, 1, 100);
+  }
+  else if (adc1 + trashhold < lr_ht_middle) {
+    lr_ht = map(adc1, 1 , lr_ht_middle, -100, -1);
+  }
+
+  if ( prev_y == bf_ard ) {
+
+  }
+  if ( prev_y != bf_ard) {
+    prev_y = bf_ard;
+    Serial.print("AIN0: Forward/Bachward ");
+    Serial.print(String(adc0) + " - " );
+    Serial.println("|" + String(bf_ard) + "|% ");
+  }
+  if ( prev_x != lr_ht) {
+    prev_x = lr_ht;
+
+    Serial.print("AIN1: Left - Right  ");
+    Serial.print(String(adc1) + " - " );
+    Serial.println("|" + String(lr_ht) + "|% ");
+  }
+
+  //  Serial.print("AIN2: "); Serial.println(adc2);
+  //  //Serial.print("AIN3: "); Serial.println(adc3);
+  //  Serial.println(" ");
+
+  delay(1);
 }
 
