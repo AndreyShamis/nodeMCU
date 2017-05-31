@@ -97,8 +97,8 @@ String build_index() {
                   "};";
   String ret = String("") + "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>Boiler Info</title></head>" +
                " <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js'></script>\n" +
-               " <script src='http://tm.hldns.ru/js/boiler.js'></script>\n" +
-               " <link rel='stylesheet' type='text/css' href='http://tm.hldns.ru/css/boiler.css'>\n" +
+               " <script src='http://tm.anshamis.com/js/boiler.js'></script>\n" +
+               " <link rel='stylesheet' type='text/css' href='http://tm.anshamis.com/css/boiler.css'>\n" +
                "<body><script>" + ret_js + "</script>\n" +
                "<div id='content'></div>" +
                "<script>\n " +               "$(document).ready(function(){ onBoilerPageLoad(); });</script>\n" +
