@@ -132,7 +132,7 @@ void TKDRequest()
 {
   // First Make Sure You Got Disconnected
   RC_Client.stop();
-  digitalWrite(LED0, !HIGH);
+  //digitalWrite(LED0, !HIGH);
   Serial.println    ("Trying to connect");
   // If Sucessfully Connected Send Connection Message
   if (RC_Client.connect(RC_Server, SERVER_PORT))
@@ -141,7 +141,7 @@ void TKDRequest()
 
     RC_Client.println ("Hello RCctrl Im CLIENT");
     RC_Client.flush();
-    blink_led(3, 100);
+    //blink_led(3, 100);
 
     Serial.println    ("Connected to SERVER");
 
@@ -279,9 +279,9 @@ void CheckWiFiConnectivity()
   {
     for (int i = 0; i < 50; i++)
     {
-      digitalWrite(LED0, !HIGH);
-      delay(50);
-      digitalWrite(LED0, !LOW);
+      //digitalWrite(LED0, !HIGH);
+      //delay(50);
+      //digitalWrite(LED0, !LOW);
       delay(50);
       Serial.print(".");
     }
