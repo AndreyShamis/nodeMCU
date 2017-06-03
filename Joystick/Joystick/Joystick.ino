@@ -1,25 +1,5 @@
 /*
-  Analog Input
-  Demonstrates analog input by reading an analog sensor on analog pin 0 and
-  turning on and off a light emitting diode(LED)  connected to digital pin 13.
-  The amount of time the LED will be on and off depends on
-  the value obtained by analogRead().
-
-  The circuit:
-   Potentiometer attached to analog input 0
-   center pin of the potentiometer to the analog pin
-   one side pin (either one) to ground
-   the other side pin to +5V
-   LED anode (long leg) attached to digital output 13
-   LED cathode (short leg) attached to ground
-
-   Note: because most Arduinos have a built-in LED attached
-  to pin 13 on the board, the LED is optional.
-
-  This example code is in the public domain.
-
-  http://www.arduino.cc/en/Tutorial/AnalogInput
-
+Andrey Shamis lolnik@gmail.com
 */
 
 #include <ESP8266WiFi.h>
@@ -27,75 +7,61 @@
 #include <Wire.h>
 #include <Adafruit_ADS1015.h>
 
-#define ADC       A0  // select the input pin for the potentiometer
-#define X_CTRL    D0
-#define Y_CTRL    D1
+//#define ADC                     A0  // select the input pin for the potentiometer
+//#define X_CTRL                  D0
+//#define Y_CTRL                  D1
 //------------------------------------------------------------------------------------
-#define     MAXSC     6           // MAXIMUM NUMBER OF CLIENTS
+#define     MAXSC               2           // MAXIMUM NUMBER OF CLIENTS
+#define     ADC_TRASH_HOLD      7
+#define     SERVER_PORT         9001
+#define     LED0                2           // WIFI Module LED
 
-// Define I/O Pins
-#define     LED0      2           // WIFI Module LED
-//#define     LED1      D0          // Connectivity With Client #1
-//#define     LED2      D2          // Connectivity With Client #2
-//#define     BUTTON    D1          // Connectivity ReInitiate Button
 
-// Authentication Variables
-char*       TKDssid;              // SERVER WIFI NAME
-char*       TKDpassword;          // SERVER PASSWORD
-
-int X = 0;
-int Y = 0;
+//int X = 0;
+//int Y = 0;
 
 //int sensorPin = A0;    // select the input pin for the potentiometer
 //int ledPin = D7;      // select the pin for the LED
 //int sensorValue = 0;  // variable to store the value coming from the sensor
 
 int bf_ard_middle = 0;
-int lr_ht_middle = 0;
-int prev_x = 0;
-int prev_y = 0;
+int lr_ht_middle  = 0;
+int prev_x        = 0;
+int prev_y        = 0;
+int bf_ard        = 0;
+int lr_ht         = 0;
 
 Adafruit_ADS1015 ads;     /* Use thi for the 12-bit version */
-WiFiServer  TKDServer(9001);      // THE SERVER AND THE PORT NUMBER
-WiFiClient  TKDClient[MAXSC];     // THE SERVER CLIENTS (Devices)
+WiFiServer  RC_Server(SERVER_PORT);       // THE SERVER AND THE PORT NUMBER
+WiFiClient  RC_Client[MAXSC];             // THE SERVER CLIENTS (Devices)
 
 /**
 
 */
 void setup() {
-  // declare the ledPin as an OUTPUT:
-  //  pinMode(ledPin, OUTPUT);
-  //  // put your setup code here, to run once:
-  //  pinMode(X_CTRL, OUTPUT);
-  //  pinMode(Y_CTRL, OUTPUT);
-  //  digitalWrite(X_CTRL, LOW);
-  //  digitalWrite(Y_CTRL, LOW);
   Serial.begin(115200);
   Serial.println("");
   Serial.println("PASS: Serial communication started.");
 
   // Setting The Mode Of Pins
   pinMode(LED0, OUTPUT);          // WIFI OnBoard LED Light
-  //pinMode(LED1, OUTPUT);          // Indicator For Client #1 Connectivity
-  //pinMode(LED2, OUTPUT);          // Indicator For Client #2 Connectivity
-  //pinMode(BUTTON, INPUT_PULLUP);  // Initiate Connectivity
 
-  // The ADC input range (or gain) can be changed via the following
-  // functions, but be careful never to exceed VDD +0.3V max, or to
-  // exceed the upper and lower limits if you adjust the input range!
-  // Setting these values incorrectly may destroy your ADC!
-  //                                                                ADS1015  ADS1115
-  //                                                                -------  -------
-  // ads.setGain(GAIN_TWOTHIRDS);  // 2/3x gain +/- 6.144V  1 bit = 3mV      0.1875mV (default)
-  //ads.setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
-  // ads.setGain(GAIN_TWO);        // 2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
-  // ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
-  // ads.setGain(GAIN_EIGHT);      // 8x gain   +/- 0.512V  1 bit = 0.25mV   0.015625mV
-  // ads.setGain(GAIN_SIXTEEN);    // 16x gain  +/- 0.256V  1 bit = 0.125mV  0.0078125mV
+  // SET GAIN
   ads.begin();
   // Setting Up A Wifi Access Point
-  SetWifi("TAKEONE", "");
+  SetWifi("RCctrl", "");
+  // Printing IP Address --------------------------------------------------
+  Serial.println("Created SSID      : " + String(WiFi.SSID()));
+  Serial.println("Signal Strenght   : " + String(WiFi.RSSI()) + " dBm");
 
+  Serial.print  ("Server Port Num   : ");
+  Serial.println(SERVER_PORT);
+  // Printing MAC Address
+  Serial.print  ("Device MC Address : ");
+  Serial.println(String(WiFi.macAddress()));
+  // Printing IP Address
+  Serial.print  ("Device IP Address : ");
+  Serial.println(WiFi.localIP());
 }
 
 
@@ -139,6 +105,7 @@ int16_t shure_read(int port) {
   return ret;
 }
 
+
 void loop() {
   if (lr_ht_middle == 0 || bf_ard_middle == 0) {
     calculate_middle();
@@ -155,33 +122,35 @@ void loop() {
   adc0 = shure_read(0);
   adc1 = shure_read(1);
 
-
-
-  int bf_ard = 0;
-  int lr_ht = 0;
-  int trashhold = 7;
-  if (adc0 - trashhold > bf_ard_middle) {
+  if (adc0 - ADC_TRASH_HOLD > bf_ard_middle) {
     bf_ard = map(adc0, bf_ard_middle , 1100, 1, 100);
   }
-  else if (adc0 + trashhold < bf_ard_middle) {
+  else if (adc0 + ADC_TRASH_HOLD < bf_ard_middle) {
     bf_ard = map(adc0, 1 , bf_ard_middle, -100, -1);
   }
+  else if (adc0 - ADC_TRASH_HOLD <= bf_ard_middle && adc0 + ADC_TRASH_HOLD >= bf_ard_middle) {
+    bf_ard = 0;
+  }
 
-  if (adc1 - trashhold > lr_ht_middle) {
+  if (adc1 - ADC_TRASH_HOLD > lr_ht_middle) {
     lr_ht = map(adc1, lr_ht_middle , 1100, 1, 100);
   }
-  else if (adc1 + trashhold < lr_ht_middle) {
+  else if (adc1 + ADC_TRASH_HOLD < lr_ht_middle) {
     lr_ht = map(adc1, 1 , lr_ht_middle, -100, -1);
   }
-
-  if ( prev_y == bf_ard ) {
-
+  else if (adc1 - ADC_TRASH_HOLD <= lr_ht_middle && adc1 + ADC_TRASH_HOLD >= lr_ht_middle) {
+    lr_ht = 0;
   }
+
+  bool send_changes = false;
   if ( prev_y != bf_ard) {
     prev_y = bf_ard;
     Serial.print("AIN0: Forward/Bachward ");
     Serial.print(String(adc0) + " - " );
     Serial.println("|" + String(bf_ard) + "|% ");
+    //sendToClient(String("") + "AIN0: Forward/Bachward" + "|" + String(bf_ard) + "|% ");
+    send_changes = true;
+
   }
   if ( prev_x != lr_ht) {
     prev_x = lr_ht;
@@ -189,14 +158,27 @@ void loop() {
     Serial.print("AIN1: Left - Right  ");
     Serial.print(String(adc1) + " - " );
     Serial.println("|" + String(lr_ht) + "|% ");
+    //sendToClient(String("") + "AIN1: Left - Right" + "|" + String(lr_ht) + "|% ");
+    send_changes = true;
+  }
+  if(send_changes){
+   // sendToClient(String("") + "F " + String(bf_ard) + "" + " L " + String(lr_ht) + "");
+    sendToClient(String("") + String(bf_ard) + ":" + String(lr_ht) + "!");
   }
   // Checking For Available Clients
   AvailableClients();
   // Checking For Available Client Messages
   AvailableMessage();
-  delay(1);
+  //delay(1);
 }
 
+void sendToClient(String data) {
+  int i = 0;
+  if (RC_Client[i] && RC_Client[i].connected()) {
+    RC_Client[i].println(String("") + data);
+    RC_Client[i].flush();
+  }
+}
 /**
 
 */
@@ -205,16 +187,43 @@ void AvailableMessage()
   //check clients for data
   for (uint8_t i = 0; i < MAXSC; i++)
   {
-    if (TKDClient[i] && TKDClient[i].connected() && TKDClient[i].available())
+    if (RC_Client[i] && RC_Client[i].connected() && RC_Client[i].available())
     {
-      while (TKDClient[i].available())
+      while (RC_Client[i].available())
       {
-        String Message = TKDClient[i].readStringUntil('\r');
-        TKDClient[i].flush();
+        String Message = RC_Client[i].readStringUntil('\r');
+        RC_Client[i].flush();
+        
+//        sendToClient(String("") + "AIN0: Forward/Bachward" + "|" + String(bf_ard) + "|% ");
+//        sendToClient(String("") + "AIN1: Left - Right" + "|" + String(lr_ht) + "|% ");
         Serial.println("Client No " + String(i) + " - " + Message);
+        Serial.println("Client val 0 " + getSplitedValue(Message, ' ', 0));
+        Serial.println("Client val 1 " + getSplitedValue(Message, ' ', 1));
+        Serial.println("Client val 2 " + getSplitedValue(Message, ' ', 2));
+        Serial.println("Client val 3 " + getSplitedValue(Message, ' ', 3));
       }
     }
   }
+}
+
+/**
+ * 
+ */
+String getSplitedValue(String data, char separator, int index)
+{
+  int found = 0;
+  int strIndex[] = {0, -1};
+  int maxIndex = data.length()-1;
+
+  for(int i=0; i<=maxIndex && found<=index; i++){
+    if(data.charAt(i)==separator || i==maxIndex){
+        found++;
+        strIndex[0] = strIndex[1]+1;
+        strIndex[1] = (i == maxIndex) ? i+1 : i;
+    }
+  }
+
+  return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
 
 /**
@@ -222,29 +231,31 @@ void AvailableMessage()
 */
 void AvailableClients()
 {
-  if (TKDServer.hasClient())
+  if (RC_Server.hasClient())
   {
     // Read LED0 Switch To Low If High.
     if (digitalRead(LED0) == HIGH) digitalWrite(LED0, LOW);
 
-//    // Light Up LED1
-//    digitalWrite(LED1, HIGH);
+    //    // Light Up LED1
+    //    digitalWrite(LED1, HIGH);
 
     for (uint8_t i = 0; i < MAXSC; i++)
     {
       //find free/disconnected spot
-      if (!TKDClient[i] || !TKDClient[i].connected())
+      if (!RC_Client[i] || !RC_Client[i].connected())
       {
         // Checks If Previously The Client Is Taken
-        if (TKDClient[i])
+        if (RC_Client[i])
         {
-          TKDClient[i].stop();
+          RC_Client[i].stop();
         }
 
         // Checks If Clients Connected To The Server
-        if (TKDClient[i] = TKDServer.available())
+        if (RC_Client[i] = RC_Server.available())
         {
           Serial.println("New Client: " + String(i));
+          sendToClient(String("") + "F 0" + " L 0");
+          RC_Server.setNoDelay(true);
         }
 
         // Continue Scanning
@@ -253,17 +264,16 @@ void AvailableClients()
     }
 
     //no free/disconnected spot so reject
-    WiFiClient TKDClient = TKDServer.available();
-    TKDClient.stop();
+    WiFiClient RC_Client = RC_Server.available();
+    RC_Client.stop();
   }
-  else
-  {
-    // This LED Blinks If No Clients Where Available
-    digitalWrite(LED0, HIGH);
-    delay(100);
-    digitalWrite(LED0, LOW);
-    delay(100);
-  }
+//  else
+//  {
+//    // This LED Blinks If No Clients Where Available
+//    digitalWrite(LED0, HIGH);
+//    delay(10);
+//    digitalWrite(LED0, LOW);
+//  }
 }
 
 
@@ -279,13 +289,9 @@ void SetWifi(char* Name, char* Password)
   WiFi.mode(WIFI_AP_STA);
   Serial.println("WIFI Mode : AccessPoint Station");
 
-  // Setting The AccessPoint Name & Password
-  TKDssid      = Name;
-  TKDpassword  = Password;
-
   // Starting The Access Point
-  WiFi.softAP(TKDssid, TKDpassword);
-  Serial.println("WIFI < " + String(TKDssid) + " > ... Started");
+  WiFi.softAP(Name, Password);
+  Serial.println("WIFI <" + String(Name) + "> ... Started");
 
   // Wait For Few Seconds
   delay(1000);
@@ -302,8 +308,8 @@ void SetWifi(char* Name, char* Password)
   Serial.println(String(WiFi.softAPmacAddress()));
 
   // Starting Server
-  TKDServer.begin();
-  TKDServer.setNoDelay(true);
+  RC_Server.begin();
+  RC_Server.setNoDelay(true);
   Serial.println("Server Started");
 }
 
@@ -325,3 +331,17 @@ void SetWifi(char* Name, char* Password)
 //
 //
 //}
+
+
+  // The ADC input range (or gain) can be changed via the following
+  // functions, but be careful never to exceed VDD +0.3V max, or to
+  // exceed the upper and lower limits if you adjust the input range!
+  // Setting these values incorrectly may destroy your ADC!
+  //                                                                ADS1015  ADS1115
+  //                                                                -------  -------
+  // ads.setGain(GAIN_TWOTHIRDS);  // 2/3x gain +/- 6.144V  1 bit = 3mV      0.1875mV (default)
+  //ads.setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
+  // ads.setGain(GAIN_TWO);        // 2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
+  // ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
+  // ads.setGain(GAIN_EIGHT);      // 8x gain   +/- 0.512V  1 bit = 0.25mV   0.015625mV
+  // ads.setGain(GAIN_SIXTEEN);    // 16x gain  +/- 0.256V  1 bit = 0.125mV  0.0078125mV
