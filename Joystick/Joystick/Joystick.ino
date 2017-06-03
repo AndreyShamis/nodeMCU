@@ -93,7 +93,7 @@ int16_t shure_read(int port) {
   for (counter = 0; counter < 3; counter++) {
     int tmp = ads.readADC_SingleEnded(port);
     if (tmp > 1200) {
-      tmp = 1;
+      tmp = 0;
     }
     if (tmp > 1090) {
       tmp = 1100;
@@ -123,20 +123,20 @@ void loop() {
   adc1 = shure_read(1);
 
   if (adc0 - ADC_TRASH_HOLD > bf_ard_middle) {
-    bf_ard = map(adc0, bf_ard_middle , 1100, 1, 100);
+    bf_ard = map(adc0, bf_ard_middle , 1100, 1, 1000);
   }
   else if (adc0 + ADC_TRASH_HOLD < bf_ard_middle) {
-    bf_ard = map(adc0, 1 , bf_ard_middle, -100, -1);
+    bf_ard = map(adc0, 0 , bf_ard_middle, -1000, -1);
   }
   else if (adc0 - ADC_TRASH_HOLD <= bf_ard_middle && adc0 + ADC_TRASH_HOLD >= bf_ard_middle) {
     bf_ard = 0;
   }
 
   if (adc1 - ADC_TRASH_HOLD > lr_ht_middle) {
-    lr_ht = map(adc1, lr_ht_middle , 1100, 1, 100);
+    lr_ht = map(adc1, lr_ht_middle , 1100, 1, 1000);
   }
   else if (adc1 + ADC_TRASH_HOLD < lr_ht_middle) {
-    lr_ht = map(adc1, 1 , lr_ht_middle, -100, -1);
+    lr_ht = map(adc1, 0 , lr_ht_middle, -1000, -1);
   }
   else if (adc1 - ADC_TRASH_HOLD <= lr_ht_middle && adc1 + ADC_TRASH_HOLD >= lr_ht_middle) {
     lr_ht = 0;

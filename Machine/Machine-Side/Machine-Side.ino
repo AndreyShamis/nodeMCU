@@ -17,6 +17,7 @@ bool      forward_current         = true;
 int       LR_value                = 0;
 int       FB_value                = 0;
 bool      connected_to_server     = false;
+bool      forward_shield          = false;
 
 IPAddress             RC_Server(192, 168, 4, 1);
 WiFiClient            RC_Client;
@@ -41,7 +42,10 @@ Servo Servo1;  // Create a servo object
 
 */
 void forward_acc(int acc) {
-  digitalWrite(D3, HIGH); digitalWrite(D4, HIGH);
+  if(!forward_shield){
+    forward_shield = true;
+    digitalWrite(D3, HIGH); digitalWrite(D4, HIGH);
+  }
   analogWrite(D1, acc); analogWrite(D2, acc);
   
 }
@@ -50,9 +54,11 @@ void forward_acc(int acc) {
 
 */
 void backward_acc(int acc) {
-  digitalWrite(D3, LOW); digitalWrite(D4, LOW);
+  if(forward_shield){
+    forward_shield = false;
+    digitalWrite(D3, LOW); digitalWrite(D4, LOW);
+  }
   analogWrite(D1, acc); analogWrite(D2, acc);
-  
 }
 
 /**
@@ -92,11 +98,11 @@ void AvailableMessage()
       if (fb_str != "") {
         int bf_val_pult = fb_str.toInt();
         if (bf_val_pult > 0 ) {
-          FB_value  = map(bf_val_pult, 0, 100 , 300, 1023);
+          FB_value  = map(bf_val_pult, 0, 1000 , 300, 1023);
           forward = false;
         }
         else if ( bf_val_pult < 0 ) {
-          FB_value  = map(bf_val_pult * (-1), 0, 100 , 300, 1023);
+          FB_value  = map(bf_val_pult * (-1), 0, 1000 , 300, 1023);
           forward = true;
         }
         else {
@@ -107,7 +113,7 @@ void AvailableMessage()
       }
 
       if (lr_str != "") {
-        LR_value = map(lr_str.toInt(), -100, 100 , 30, 160);
+        LR_value = map(lr_str.toInt(), -1000, 1000 , 30, 160);
         //Serial.println(String("") + "LR_ new value is [" + String(LR_value) + "] from[" + lr_str + "]");
 
       }
