@@ -4,7 +4,7 @@
 #include <ESP8266mDNS.h>
 #include <Servo.h>  // Include the Servo library
 
-#define   LED0                2   // WIFI Module LED
+#define   LED0                2   // D4 WIFI Module LED
 #define   SERVO_PIN           D5  // Declare the Servo pin
 #define   ADC                 A0  // select the input pin for the potentiometer
 #define   SERVER_PORT         9001
