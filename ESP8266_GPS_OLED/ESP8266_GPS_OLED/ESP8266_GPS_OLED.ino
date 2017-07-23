@@ -47,12 +47,13 @@ void loop()
 {
   float flat, flon;
   unsigned long age, date, time, chars = 0;
-  print_int(gps.satellites(), TinyGPS::GPS_INVALID_SATELLITES, 5);
-  print_int(gps.hdop(), TinyGPS::GPS_INVALID_HDOP, 5);
+
   gps.f_get_position(&flat, &flon, &age);
   display.clearDisplay();
   display.setCursor(0, 0);
   if (TinyGPS::GPS_INVALID_F_ANGLE != flat) {
+    print_int(gps.satellites(), TinyGPS::GPS_INVALID_SATELLITES, 5);
+    print_int(gps.hdop(), TinyGPS::GPS_INVALID_HDOP, 5);
     display.print("Latitude  : ");
     display.println(flat, 5);
     display.print("Longtite  : ");
@@ -82,15 +83,15 @@ void loop()
     smartdelay(500);                                      // Run Procedure smartDelay
   }
   else {
-    print_str("NO GPS SIGNAL",20);
+    print_str("NO GPS SIGNAL", 20);
     display.println("GPS - NO FIX");
     smartdelay(1500);                                      // Run Procedure smartDelay
   }
 
   display.display();                                     // Update display
-  
 
-  
+
+
 
   //  if (millis() > 5000 && gps.charsProcessed() < 10)
   //    display.println(F("No GPS data received: check wiring"));
