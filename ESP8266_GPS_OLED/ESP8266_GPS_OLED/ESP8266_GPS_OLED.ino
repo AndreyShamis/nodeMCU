@@ -7,7 +7,7 @@
 #include <SoftwareSerial.h>                   // Software Serial Library so we can use other Pins for communication with the GPS module
 
 #define OLED_RESET          0
-
+#define OLED_ADDR           0x3C
 #define NUMFLAKES           10
 #define XPOS                0
 #define YPOS                1
@@ -31,7 +31,7 @@ int counter = 0;
 void setup()
 {
   Serial.begin(115200);
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64)
+  display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);  // initialize with the I2C addr 0x3D (for the 128x64)
   display.clearDisplay();                     // Clear OLED display
   display.setTextSize(1);                     // Set OLED text size to small
   display.setTextColor(WHITE);                // Set OLED color to White
