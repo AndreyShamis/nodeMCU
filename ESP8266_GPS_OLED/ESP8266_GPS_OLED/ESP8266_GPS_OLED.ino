@@ -26,6 +26,8 @@ double Home_LNG = 34.8523;                    // Your Home Longitude
 TinyGPS gps;                                  // Create an Instance of the TinyGPS++ object called gps
 SoftwareSerial ss(GPS_RXPin, GPS_TXPin);      // The serial connection to the GPS device
 Adafruit_SSD1306 display(OLED_RESET);
+int counter = 0;
+
 void setup()
 {
   Serial.begin(115200);
@@ -40,19 +42,35 @@ void setup()
   ss.begin(GPSBaud);                          // Set Software Serial Comm Speed to 9600
   Serial.print("Simple TinyGPS library v. ");
   Serial.println(TinyGPS::library_version());
-  delay(1500);
+  delay(1000);
+}
+
+
+/**
+ * satellites used in last full GPGGA sentence
+ */
+unsigned short satellites() {
+  unsigned short _numsats = gps.satellites();
+  if (_numsats == 255) {
+    return 0;
+  }
+  else {
+    return _numsats;
+  }
 }
 
 void loop()
 {
+  counter++;
   float flat, flon;
   unsigned long age, date, time, chars = 0;
-
+  
   gps.f_get_position(&flat, &flon, &age);
+  unsigned short sats = satellites();
   display.clearDisplay();
   display.setCursor(0, 0);
   if (TinyGPS::GPS_INVALID_F_ANGLE != flat) {
-    print_int(gps.satellites(), TinyGPS::GPS_INVALID_SATELLITES, 5);
+    print_int(sats, TinyGPS::GPS_INVALID_SATELLITES, 5);
     print_int(gps.hdop(), TinyGPS::GPS_INVALID_HDOP, 5);
     display.print("Latitude  : ");
     display.println(flat, 5);
@@ -60,10 +78,8 @@ void loop()
     display.println(flon, 4);
     print_float(flat, TinyGPS::GPS_INVALID_F_ANGLE, 10, 6);
     print_float(flon, TinyGPS::GPS_INVALID_F_ANGLE, 11, 6);
-    display.print("Satellites: ");
-    display.println(gps.satellites());
-    display.print("Elevation : ");
-    display.println(gps.f_altitude());
+    display.println("Sats: " + String(sats) + " #" + String(counter));
+    display.println("Elevation : " + String(gps.f_altitude()));
     //display.println("ft");
     //  display.print("Time UTC  : ");
     //  display.print(gps.time.hour());                       // GPS time UTC
@@ -71,26 +87,28 @@ void loop()
     //  display.print(gps.time.minute());                     // Minutes
     //  display.print(":");
     //  display.println(gps.time.second());                   // Seconds
-    display.print("Heading   : ");
-    display.println(gps.f_course());
-    display.print("Speed     : ");
-    display.println(gps.f_speed_kmph());
+    display.println("Heading   : " + String(gps.f_course()));
+    display.println("Speed     : " + String(gps.f_speed_kmph()));
 
     float DTH = TinyGPS::distance_between(flat, flon, Home_LAT, Home_LNG) / 1000;
     display.print("KM to Home: ");                        // Have TinyGPS Calculate distance to home and display it
     display.print(DTH);
     print_int(flat == TinyGPS::GPS_INVALID_F_ANGLE ? 0xFFFFFFFF : (unsigned long)TinyGPS::distance_between(flat, flon, Home_LAT, Home_LNG) / 1000, 0xFFFFFFFF, 9);
-    smartdelay(500);                                      // Run Procedure smartDelay
+    //smartdelay(500);                                      // Run Procedure smartDelay
   }
   else {
     print_str("NO GPS SIGNAL", 20);
-    display.println("GPS - NO FIX");
-    smartdelay(1500);                                      // Run Procedure smartDelay
+    Serial.println("Satellites : " + String(sats) + " Counter " + String(counter));
+    display.println("GPS - NO FIX - #" + String(counter));
+    display.println("Satellites : " + String(sats));
+    delay(1000);
   }
 
   display.display();                                     // Update display
-
-
+  smartdelay(100);                                      // Run Procedure smartDelay
+  if( counter > 2000){
+    counter = 0;
+  }
 
 
   //  if (millis() > 5000 && gps.charsProcessed() < 10)
@@ -131,7 +149,7 @@ static void print_float(float val, float invalid, int len, int prec)
       Serial.print(' ');
   }
   Serial.println("");
-  smartdelay(0);
+  //smartdelay(0);
 }
 
 /**
@@ -150,7 +168,7 @@ static void print_int(unsigned long val, unsigned long invalid, int len)
   if (len > 0)
     sz[len - 1] = ' ';
   Serial.println(sz);
-  smartdelay(0);
+  //smartdelay(0);
 }
 
 /**
@@ -172,7 +190,7 @@ static void print_date(TinyGPS &gps)
     Serial.print(sz);
   }
   print_int(age, TinyGPS::GPS_INVALID_AGE, 5);
-  smartdelay(0);
+  //smartdelay(0);
 }
 
 /**
@@ -183,7 +201,7 @@ static void print_str(const char *str, int len)
   int slen = strlen(str);
   for (int i = 0; i < len; ++i)
     Serial.print(i < slen ? str[i] : ' ');
-  smartdelay(0);
+  //smartdelay(0);
   Serial.println("");
 }
 
