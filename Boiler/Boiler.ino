@@ -26,20 +26,21 @@ typedef enum {
   KEEP    = 3,  //  Controlled by BOARD, keep temperature between MAX_TMP <> TRASHHOLD_TMP, secured by MAX_TMP
 } BoilerModeType;
 
-#define               ONE_WIRE_BUS  D4 //D4 2
-#define               BOILER_VCC    D7 //D7 13
-#define               NUMBER_OF_DEVICES 1
-#define               CS_PIN        D3
+#define   ONE_WIRE_BUS              D4 //D4 2
+#define   BOILER_VCC                D7 //D7 13
+#define   NUMBER_OF_DEVICES         1
+#define   CS_PIN                    D3
 
-const char  *ssid             = "RadiationG";
-const char  *password         = "polkalol";
-const int   sleepTimeS        = 10;  // Time to sleep (in seconds):
-int         counter           = 0;
-bool        boilerStatus      = 0;
-float       MAX_POSSIBLE_TMP  = 65;
-bool        secure_disabled   = false;
-float       temperatureKeep   = 40;
-float       current_temp      = -10;
+const char  *ssid                   = "RadiationG";
+const char  *password               = "polkalol";
+
+const int   sleepTimeS              = 10;  // Time to sleep (in seconds):
+int         counter                 = 0;
+bool        boilerStatus            = 0;
+float       MAX_POSSIBLE_TMP        = 65;
+bool        secure_disabled         = false;
+float       temperatureKeep         = 40;
+float       current_temp            = -10;
 OneWire             oneWire(ONE_WIRE_BUS);
 DallasTemperature   sensor(&oneWire);
 ESP8266WebServer    server(80);
@@ -68,104 +69,6 @@ String  printTemperatureToSerial();
 String  read_setting(const char* fname);
 void    save_setting(const char* fname, String value);
 
-String build_index() {
-  String ret_js = String("") + "boiler = {" +
-                  "'boiler_mode': '" + String(boilerMode) + "'," +
-                  "'boiler_status': '" + String(boilerStatus) + "'," +
-                  "'disbaled_by_watch': '" + String(secure_disabled) + "'," +
-                  "'max_temperature': '" + String(MAX_POSSIBLE_TMP) + "'," +
-                  "'keep_temperature': '" + String((int)temperatureKeep) + "'," +
-                  "'current_temperature': '" + String(printTemperatureToSerial()) + "'," +
-                  "'flash_chip_id': '" + String(ESP.getFlashChipId()) + "'," +
-                  "'flash_chip_size': '" + String(ESP.getFlashChipSize()) + "'," +
-                  "'flash_chip_speed': '" + String(ESP.getFlashChipSpeed()) + "'," +
-                  "'flash_chip_mode': '" + String(ESP.getFlashChipMode()) + "'," +
-                  "'core_version': '" + ESP.getCoreVersion() + "'," +
-                  "'sdk_version': '" + String(ESP.getSdkVersion()) + "'," +
-                  "'boot_version': '" + ESP.getBootVersion() + "'," +
-                  "'boot_mode': '" + String(ESP.getBootMode()) + "'," +
-                  "'cpu_freq': '" + String(ESP.getCpuFreqMHz()) + "'," +
-                  "'mac_addr': '" + WiFi.macAddress() + "'," +
-                  "'wifi_channel': '" + String(WiFi.channel()) + "'," +
-                  "'rssi': '" + WiFi.RSSI() + "'," +
-                  "'sketch_size': '" + String(ESP.getSketchSize()) + "'," +
-                  "'free_sketch_size': '" + String(ESP.getFreeSketchSpace()) + "'," +
-                  "'dallas_addr': '" + getAddressString(insideThermometer) + "'," +
-                  "'time_str': '" + timeClient.getFormattedTime() + "'," +
-                  "'time_epoch': '" + timeClient.getEpochTime() + "'," +
-                  "'hostname': '" + WiFi.hostname() + "'" +
-                  "};";
-  String ret = String("") + "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>Boiler Info</title></head>" +
-               " <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js'></script>\n" +
-               " <script src='http://tm.anshamis.com/js/boiler.js'></script>\n" +
-               " <link rel='stylesheet' type='text/css' href='http://tm.anshamis.com/css/boiler.css'>\n" +
-               "<body><script>" + ret_js + "</script>\n" +
-               "<div id='content'></div>" +
-               "<script>\n " +               "$(document).ready(function(){ onBoilerPageLoad(); });</script>\n" +
-               "</body></html>";
-  return ret;
-}
-String build_device_info() {
-  String ret = "<pre>Boiler MODE: " + String(boilerMode) + "\t\t\t Boiler status: " + String(boilerStatus);
-  ret += "\ngetFlashChipId: " + String(ESP.getFlashChipId()) + "\t\t getFlashChipSize: " + String(ESP.getFlashChipSize());
-  ret += "\ngetFlashChipSpeed: " + String(ESP.getFlashChipSpeed()) + "\t getFlashChipMode: " + String(ESP.getFlashChipMode());
-  ret += "\ngetSdkVersion: " + String(ESP.getSdkVersion()) + "\t getCoreVersion: " + ESP.getCoreVersion() + "\t\t getBootVersion: " + ESP.getBootVersion();
-  ret += "\ngetBootMode: " + String(ESP.getBootMode());
-  ret += "\ngetCpuFreqMHz: " + String(ESP.getCpuFreqMHz());
-  ret += "\nmacAddress: " + WiFi.macAddress() + "\t Channel : " + String(WiFi.channel()) + "\t\t\t RSSI: " + WiFi.RSSI();
-  ret += "\ngetSketchSize: " + String(ESP.getSketchSize()) + "\t\t getFreeSketchSpace: " + String(ESP.getFreeSketchSpace());
-  //ret += "\ngetResetReason: " + ESP.getResetReason();
-  //ret += "\ngetResetInfo: " + ESP.getResetInfo();
-  ret += "\nAddress : " + getAddressString(insideThermometer) + "</pre>";
-  return ret;
-}
-void handleRoot() {
-
-  //  for (uint8_t i=0; i<server.args(); i++){
-  //    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  //  }
-  //  message += server.client();
-  String message = build_index();
-  server.send(200, "text/html", message);
-}
-
-/***
-
-*/
-void saveBoilerMode() {
-  String message = "Saving Boiler Mode\n\n";
-  message += "URI: " + server.uri() + "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args() + "\n";
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-    if (server.argName(i) == "temperatureKeep") {
-      temperatureKeep = server.arg(i).toFloat();
-      boilerMode = KEEP;
-      Serial.println("Keep temperature " + String(temperatureKeep));
-      if (temperatureKeep > MAX_POSSIBLE_TMP) {
-        temperatureKeep = MAX_POSSIBLE_TMP;
-        Serial.println("Override Keep temperature " + String(temperatureKeep));
-      }
-    }
-  }
-}
-
-/**
-
-*/
-void handleNotFound() {
-  String message = "File Not Found\n\n";
-  message += "URI: " + server.uri() + "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args() + "\n";
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  }
-  server.send(404, "text/plain", message);
-}
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -185,6 +88,8 @@ void setup(void) {
   Serial.println("PASS: SPIFFS startted.");
   //  Serial.println("INFO: Compile SPIFFS");
   //  SPIFFS.format();
+  
+  WiFi.mode(WIFI_AP_STA);       //  Disable AP Mode
   WiFi.begin(ssid, password);
 
   // Wait for connection
@@ -324,6 +229,107 @@ void loop(void) {
   }
 
 }
+
+String build_index() {
+  String ret_js = String("") + "boiler = {" +
+                  "'boiler_mode': '" + String(boilerMode) + "'," +
+                  "'boiler_status': '" + String(boilerStatus) + "'," +
+                  "'disbaled_by_watch': '" + String(secure_disabled) + "'," +
+                  "'max_temperature': '" + String(MAX_POSSIBLE_TMP) + "'," +
+                  "'keep_temperature': '" + String((int)temperatureKeep) + "'," +
+                  "'current_temperature': '" + String(printTemperatureToSerial()) + "'," +
+                  "'flash_chip_id': '" + String(ESP.getFlashChipId()) + "'," +
+                  "'flash_chip_size': '" + String(ESP.getFlashChipSize()) + "'," +
+                  "'flash_chip_speed': '" + String(ESP.getFlashChipSpeed()) + "'," +
+                  "'flash_chip_mode': '" + String(ESP.getFlashChipMode()) + "'," +
+                  "'core_version': '" + ESP.getCoreVersion() + "'," +
+                  "'sdk_version': '" + String(ESP.getSdkVersion()) + "'," +
+                  "'boot_version': '" + ESP.getBootVersion() + "'," +
+                  "'boot_mode': '" + String(ESP.getBootMode()) + "'," +
+                  "'cpu_freq': '" + String(ESP.getCpuFreqMHz()) + "'," +
+                  "'mac_addr': '" + WiFi.macAddress() + "'," +
+                  "'wifi_channel': '" + String(WiFi.channel()) + "'," +
+                  "'rssi': '" + WiFi.RSSI() + "'," +
+                  "'sketch_size': '" + String(ESP.getSketchSize()) + "'," +
+                  "'free_sketch_size': '" + String(ESP.getFreeSketchSpace()) + "'," +
+                  "'dallas_addr': '" + getAddressString(insideThermometer) + "'," +
+                  "'time_str': '" + timeClient.getFormattedTime() + "'," +
+                  "'time_epoch': '" + timeClient.getEpochTime() + "'," +
+                  "'hostname': '" + WiFi.hostname() + "'" +
+                  "};";
+  String ret = String("") + "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>Boiler Info</title></head>" +
+               " <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js'></script>\n" +
+               " <script src='http://tm.anshamis.com/js/boiler.js'></script>\n" +
+               " <link rel='stylesheet' type='text/css' href='http://tm.anshamis.com/css/boiler.css'>\n" +
+               "<body><script>" + ret_js + "</script>\n" +
+               "<div id='content'></div>" +
+               "<script>\n " +               "$(document).ready(function(){ onBoilerPageLoad(); });</script>\n" +
+               "</body></html>";
+  return ret;
+}
+String build_device_info() {
+  String ret = "<pre>Boiler MODE: " + String(boilerMode) + "\t\t\t Boiler status: " + String(boilerStatus);
+  ret += "\ngetFlashChipId: " + String(ESP.getFlashChipId()) + "\t\t getFlashChipSize: " + String(ESP.getFlashChipSize());
+  ret += "\ngetFlashChipSpeed: " + String(ESP.getFlashChipSpeed()) + "\t getFlashChipMode: " + String(ESP.getFlashChipMode());
+  ret += "\ngetSdkVersion: " + String(ESP.getSdkVersion()) + "\t getCoreVersion: " + ESP.getCoreVersion() + "\t\t getBootVersion: " + ESP.getBootVersion();
+  ret += "\ngetBootMode: " + String(ESP.getBootMode());
+  ret += "\ngetCpuFreqMHz: " + String(ESP.getCpuFreqMHz());
+  ret += "\nmacAddress: " + WiFi.macAddress() + "\t Channel : " + String(WiFi.channel()) + "\t\t\t RSSI: " + WiFi.RSSI();
+  ret += "\ngetSketchSize: " + String(ESP.getSketchSize()) + "\t\t getFreeSketchSpace: " + String(ESP.getFreeSketchSpace());
+  //ret += "\ngetResetReason: " + ESP.getResetReason();
+  //ret += "\ngetResetInfo: " + ESP.getResetInfo();
+  ret += "\nAddress : " + getAddressString(insideThermometer) + "</pre>";
+  return ret;
+}
+void handleRoot() {
+
+  //  for (uint8_t i=0; i<server.args(); i++){
+  //    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+  //  }
+  //  message += server.client();
+  String message = build_index();
+  server.send(200, "text/html", message);
+}
+
+/***
+
+*/
+void saveBoilerMode() {
+  String message = "Saving Boiler Mode\n\n";
+  message += "URI: " + server.uri() + "\nMethod: ";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += server.args() + "\n";
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+    if (server.argName(i) == "temperatureKeep") {
+      temperatureKeep = server.arg(i).toFloat();
+      boilerMode = KEEP;
+      Serial.println("Keep temperature " + String(temperatureKeep));
+      if (temperatureKeep > MAX_POSSIBLE_TMP) {
+        temperatureKeep = MAX_POSSIBLE_TMP;
+        Serial.println("Override Keep temperature " + String(temperatureKeep));
+      }
+    }
+  }
+}
+
+/**
+
+*/
+void handleNotFound() {
+  String message = "File Not Found\n\n";
+  message += "URI: " + server.uri() + "\nMethod: ";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += server.args() + "\n";
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+  }
+  server.send(404, "text/plain", message);
+}
+
+
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
