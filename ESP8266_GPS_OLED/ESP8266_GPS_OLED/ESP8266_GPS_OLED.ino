@@ -30,7 +30,7 @@ int counter = 0;
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(921600);                       // IMPORTANT : Changed from 115200
   display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);  // initialize with the I2C addr 0x3D (for the 128x64)
   display.clearDisplay();                     // Clear OLED display
   display.setTextSize(1);                     // Set OLED text size to small
@@ -70,7 +70,9 @@ void loop()
   display.clearDisplay();
   display.setCursor(0, 0);
   if (TinyGPS::GPS_INVALID_F_ANGLE != flat) {
+    Serial.print("Number of satellites  : ");
     print_int(sats, TinyGPS::GPS_INVALID_SATELLITES, 5);
+    Serial.print("GPS hoop  : ");
     print_int(gps.hdop(), TinyGPS::GPS_INVALID_HDOP, 5);
     display.print("Latitude  : ");
     display.println(flat, 5);
@@ -93,8 +95,10 @@ void loop()
     float DTH = TinyGPS::distance_between(flat, flon, Home_LAT, Home_LNG) / 1000;
     display.print("KM to Home: ");                        // Have TinyGPS Calculate distance to home and display it
     display.print(DTH);
-    print_int(flat == TinyGPS::GPS_INVALID_F_ANGLE ? 0xFFFFFFFF : (unsigned long)TinyGPS::distance_between(flat, flon, Home_LAT, Home_LNG) / 1000, 0xFFFFFFFF, 9);
+    Serial.println("Distance to home  : " + String(DTH));
+    //print_int(flat == TinyGPS::GPS_INVALID_F_ANGLE ? 0xFFFFFFFF :TinyGPS::distance_between(flat, flon, Home_LAT, Home_LNG) / 1000, 0xFFFFFFFF, 9);
     //smartdelay(500);                                      // Run Procedure smartDelay
+    Serial.println("");
   }
   else {
     print_str("NO GPS SIGNAL", 20);
@@ -106,7 +110,7 @@ void loop()
 
   display.display();                                     // Update display
   smartdelay(100);                                      // Run Procedure smartDelay
-  if( counter > 2000){
+  if( counter > 9999){
     counter = 0;
   }
 
