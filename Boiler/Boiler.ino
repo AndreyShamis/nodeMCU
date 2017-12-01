@@ -89,40 +89,42 @@ void setup(void) {
   Serial.println("PASS: SPIFFS startted.");
   //  Serial.println("INFO: Compile SPIFFS");
   //  SPIFFS.format();
-  
-  WiFi.mode(WIFI_STA);       //  Disable AP Mode
+  WiFi.mode(WIFI_STA);       //  Disable AP Mode - set mode to WIFI_AP, WIFI_STA, or WIFI_AP_STA.
   WiFi.begin(ssid, password);
 
   // Wait for connection
-  Serial.print("INFO: Connecting to ");
-  Serial.print(ssid);
-  Serial.print(password);
-  Serial.println("...");
+  Serial.println("INFO: Connecting to [" + String(ssid) + "][" + String(password) + "]...");
+  int con_counter = 0;
   while (WiFi.status() != WL_CONNECTED) {
-    delay(250);
+    delay(100);
     Serial.print(".");
+    con_counter++;
+    if (con_counter % 20 == 0) {
+      Serial.println("");
+      Serial.println("WARNING: Still connecting...");
+    }
   }
   Serial.println("");
-  Serial.print("PASS: Connected to ");
-  Serial.println(ssid);
-  Serial.print("PASS:  IP address: ");
+  Serial.print("PASS: Connected to [" + String(ssid) + "]  IP address: ");
   Serial.println(WiFi.localIP());
-
   if (MDNS.begin("esp8266")) {
     Serial.println("PASS: MDNS responder started");
   }
   Serial.println("-----------------------------------");
-  Serial.print("Found ");
+  timeClient.begin();
+
+  Serial.print("INFO: Found ");
   Serial.print(sensor.getDeviceCount(), DEC);
-  Serial.println(" devices.");
-  Serial.print("Parasite power is: ");
+  Serial.println(" Thermometer Dallas devices.");
+
+  Serial.print("INFO: Parasite power is: ");
   if (sensor.isParasitePowerMode()) {
-    Serial.println("ON");
+    Serial.println("isParasitePowerMode ON");
   }
   else {
-    Serial.println("OFF");
+    Serial.println("isParasitePowerMode OFF");
   }
-
+  
   if (!sensor.getAddress(insideThermometer, 0)) {
     Serial.println("Unable to find address for Device 0");
   }
@@ -152,14 +154,14 @@ void setup(void) {
   Serial.println("INFO: Staring HTTP server...");
   server.begin();
   Serial.println("PASS: HTTP server started");
+
   //  save_setting("/ssid", ssid);
   //  save_setting("/password", password);
-  Serial.println(read_setting("/ssid"));
-  Serial.println(read_setting("/password"));
+  //Serial.println(read_setting("/ssid"));
+  //Serial.println(read_setting("/password"));
   // Sleep
   //Serial.println("ESP8266 in sleep mode");
   //ESP.deepSleep(sleepTimeS * 1000000, RF_DEFAULT);
-  timeClient.begin();
   timeClient.update();
 
 }
@@ -174,7 +176,7 @@ void loop(void) {
   if (counter % 50 == 0) {
     current_temp = getTemperature();
   }
-  if (boilerMode == KEEP && !boilerStatus) {
+  if (!boilerStatus && boilerMode == KEEP) {
     if (current_temp < _min(temperatureKeep,MAX_POSSIBLE_TMP) && current_temp > 0) {
       Serial.println("WARNING: Keep enabled, enable boiler");
       enableLoad();
@@ -200,7 +202,8 @@ void loop(void) {
     counter = 0;
     printTemperatureToSerial();
   }
-  if (counter == 5) {
+  if (counter == 25) {
+    timeClient.update();
     Serial.println("INFO: -----------------------------------------------------------------------");
     Serial.println("Boiler MODE: " + String(boilerMode) + "\t\t\t Boiler status: " + String(boilerStatus));
     Serial.println("getFlashChipId: " + String(ESP.getFlashChipId()) + "\t\t getFlashChipSize: " + String(ESP.getFlashChipSize()));
@@ -223,11 +226,10 @@ void loop(void) {
   //ESP.deepSleep(sleepTimeS * 1000000, RF_DEFAULT);
   delay(100);
   counter++;
-  if (counter % 200 == 0) {
-
-    Serial.println(timeClient.getFormattedTime());
-    //Serial.println(timeClient.getEpochTime());
-  }
+//  if (counter % 200 == 0) {
+//    Serial.println(timeClient.getFormattedTime());
+//    //Serial.println(timeClient.getEpochTime());
+//  }
 
 }
 
@@ -237,7 +239,7 @@ String build_index() {
                   "'boiler_status': '" + String(boilerStatus) + "'," +
                   "'disbaled_by_watch': '" + String(secure_disabled) + "'," +
                   "'max_temperature': '" + String(MAX_POSSIBLE_TMP) + "'," +
-                  "'keep_temperature': '" + String((int)temperatureKeep) + "'," +
+                  "'keep_temperature': '" + String(temperatureKeep) + "'," +
                   "'current_temperature': '" + String(printTemperatureToSerial()) + "'," +
                   "'flash_chip_id': '" + String(ESP.getFlashChipId()) + "'," +
                   "'flash_chip_size': '" + String(ESP.getFlashChipSize()) + "'," +
