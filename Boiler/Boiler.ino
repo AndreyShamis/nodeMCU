@@ -27,7 +27,7 @@ typedef enum {
 } BoilerModeType;
 
 #define   ONE_WIRE_BUS              D4 //D4 2
-#define   BOILER_VCC                D7 //D7 13
+#define   LOAD_VCC                  D7 //D7 13
 #define   NUMBER_OF_DEVICES         1
 #define   CS_PIN                    D3
 
@@ -62,9 +62,9 @@ BoilerModeType boilerMode = MANUAL;
 //};
 ADC_MODE(ADC_VCC);
 String  getAddressString(DeviceAddress deviceAddress);
-void    disableBoiler();
-void    enableBoiler();
-float   getTemperature();
+void    disableLoad();
+void    enableLoad();
+float   getTemperature(int dev = 0);
 String  printTemperatureToSerial();
 String  read_setting(const char* fname);
 void    save_setting(const char* fname, String value);
@@ -77,8 +77,8 @@ void    save_setting(const char* fname, String value);
 */
 void setup(void) {
   //ADC_MODE(ADC_VCC);
-  pinMode(BOILER_VCC, OUTPUT);
-  disableBoiler();
+  pinMode(LOAD_VCC, OUTPUT);
+  disableLoad();
   sensor.begin();
   Serial.begin(115200);
   Serial.println("");
@@ -89,7 +89,7 @@ void setup(void) {
   //  Serial.println("INFO: Compile SPIFFS");
   //  SPIFFS.format();
   
-  WiFi.mode(WIFI_AP_STA);       //  Disable AP Mode
+  WiFi.mode(WIFI_STA);       //  Disable AP Mode
   WiFi.begin(ssid, password);
 
   // Wait for connection
@@ -133,12 +133,12 @@ void setup(void) {
     server.send(200, "text/plain", "this works as well");
   });
   server.on("/eb", []() {
-    enableBoiler();
+    enableLoad();
     boilerMode = MANUAL;
     handleRoot();
   });
   server.on("/db", []() {
-    disableBoiler();
+    disableLoad();
     boilerMode = MANUAL;
     handleRoot();
   });
@@ -174,16 +174,16 @@ void loop(void) {
     current_temp = getTemperature();
   }
   if (boilerMode == KEEP && !boilerStatus) {
-    if (current_temp < temperatureKeep &&  current_temp < MAX_POSSIBLE_TMP && current_temp > 0) {
+    if (current_temp < _min(temperatureKeep,MAX_POSSIBLE_TMP) && current_temp > 0) {
       Serial.println("WARNING: Keep enabled, enable boiler");
-      enableBoiler();
+      enableLoad();
     }
   }
   if (boilerStatus) {
     if (current_temp > MAX_POSSIBLE_TMP || (boilerMode == KEEP && current_temp > temperatureKeep)) {
       Serial.println("WARNING: Current temperature is bigger of possible maximum. " + String(current_temp) + ">" + String(MAX_POSSIBLE_TMP));
       Serial.println("WARNING: Disabling Load");
-      disableBoiler();
+      disableLoad();
       secure_disabled = true;
     }
   }
@@ -191,7 +191,7 @@ void loop(void) {
   if (current_temp < 1) {
     Serial.println("WARNING: Very LOW temperatute. " + String(current_temp));
     Serial.println("WARNING: Disabling Load");
-    disableBoiler();
+    disableLoad();
     secure_disabled = true;
   }
 
@@ -334,12 +334,87 @@ void handleNotFound() {
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-/**
 
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+/**
+   Enable Load
+*/
+void enableLoad() {
+  float current_temp = getTemperature(0);
+  if (current_temp > MAX_POSSIBLE_TMP) {
+    Serial.println("ERROR: Current temperature is bigger of possible maximum. " + String(current_temp) + ">" + String(MAX_POSSIBLE_TMP));
+  }
+  else {
+    secure_disabled = false;
+    boilerStatus = 1;
+    digitalWrite(LOAD_VCC, 1);
+  }
+}
+
+/**
+   Disable Load
+*/
+void disableLoad() {
+  boilerStatus = 0;
+  digitalWrite(LOAD_VCC, 0);
+}
+//
+///**
+//   Get Temperature
+//*/
+//float getTemperature() {
+//  sensor.requestTemperatures();
+//  return sensor.getTempC(insideThermometer);
+//}
+/**
+   Get Temperature
+*/
+float getTemperature(int dev/*=0*/) {
+  //Serial.println("DEBUG: Requesting device " + String(dev));
+  sensor.setWaitForConversion(false);  // makes it async
+  sensor.requestTemperatures();
+  sensor.setWaitForConversion(true);  // makes it async
+  return sensor.getTempCByIndex(dev);
+  //return sensor.getTempC(insideThermometer[dev]);
+}
+
+/**
+   Get end print temperature to serial
+*/
+String printTemperatureToSerial() {
+  int dc = sensor.getDeviceCount();
+  for (int i = 0 ; i < dc; i++) {
+    current_temp       = getTemperature(i);
+    Serial.print("INFO: Temperature[" + String(i) + "] C: ");
+    Serial.println(current_temp);
+  }
+  return String(current_temp);
+}
+
+/**
+ * 
+ */
+String get_thermometers_addr() {
+  String data = "[";
+  int i = 0;
+  int counter = sensor.getDeviceCount();
+  for (i = 0; i < counter; i++) {
+    data = data + String("\"") + String(getAddressString(insideThermometer)) + String("\" , "); // TODO insideThermometer[i]
+    //Serial.println("Build  " + String(i) + " : " + String(getAddressString(insideThermometer[i])) + " "  + data);
+  }
+  data = data + "]";
+  return data;
+}
+
+/**
+  Convert Dallas Address to String
 */
 String getAddressString(DeviceAddress deviceAddress) {
   String ret = "";
-  for (uint8_t i = 0; i < 8; i++) {
+  uint8_t i;
+  for (i = 0; i < 8; i++) {
     if (deviceAddress[i] < 16) {
       ret += "0";
     }
@@ -351,51 +426,11 @@ String getAddressString(DeviceAddress deviceAddress) {
   return ret;
 }
 
-/**
-   Enable boiler
-*/
-void enableBoiler() {
-  float current_temp = getTemperature();
-  if (current_temp > MAX_POSSIBLE_TMP) {
-    Serial.println("ERROR: Current temperature is bigger of possible maximum. " + String(current_temp) + ">" + String(MAX_POSSIBLE_TMP));
-  }
-  else {
-    secure_disabled = false;
-    boilerStatus = 1;
-    digitalWrite(BOILER_VCC, 1);
-  }
-}
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 /**
-   Disable Boiler
-*/
-void disableBoiler() {
-  boilerStatus = 0;
-  digitalWrite(BOILER_VCC, 0);
-}
-
-
-/**
-   Get Temperature
-*/
-float getTemperature() {
-  sensor.requestTemperatures();
-  return sensor.getTempC(insideThermometer);
-}
-
-/**
-   Get end print temperature to serial
-*/
-String printTemperatureToSerial() {
-  current_temp       = getTemperature();
-  Serial.print("INFO: Temperature C: ");
-  Serial.println(current_temp);
-  return String(current_temp);
-}
-
-
-/**
-
+  Write to file content on SPIFFS
 */
 void save_setting(const char* fname, String value) {
   File f = SPIFFS.open(fname, "w");
@@ -411,7 +446,7 @@ void save_setting(const char* fname, String value) {
 }
 
 /**
-
+  Read file content from SPIFFS
 */
 String read_setting(const char* fname) {
   String s      = "";
