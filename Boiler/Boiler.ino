@@ -26,6 +26,7 @@ typedef enum {
   KEEP    = 3,  //  Controlled by BOARD, keep temperature between MAX_TMP <> TRASHHOLD_TMP, secured by MAX_TMP
 } BoilerModeType;
 
+#define   UART_BAUD_RATE            921600
 #define   ONE_WIRE_BUS              D4 //D4 2
 #define   LOAD_VCC                  D7 //D7 13
 #define   NUMBER_OF_DEVICES         1
@@ -80,7 +81,7 @@ void setup(void) {
   pinMode(LOAD_VCC, OUTPUT);
   disableLoad();
   sensor.begin();
-  Serial.begin(115200);
+  Serial.begin(UART_BAUD_RATE);
   Serial.println("");
   Serial.println("PASS: Serial communication started.");
   Serial.println("INFO: Starting SPIFFS...");
