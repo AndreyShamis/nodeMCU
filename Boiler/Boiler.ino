@@ -7,7 +7,6 @@ extern "C" {
 #include "user_interface.h"
 #include "cont.h"
 }
-#include <Time.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include <Wire.h>
