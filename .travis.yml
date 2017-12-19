@@ -11,12 +11,18 @@ before_install:
   - wget -O Arduino-Temperature-Control-Library-master.zip https://github.com/milesburton/Arduino-Temperature-Control-Library/archive/master.zip
   - wget -O NTPClient.zip https://github.com/arduino-libraries/NTPClient/archive/master.zip
   - wget -O ESP8266Ping.zip https://github.com/dancol90/ESP8266Ping/archive/master.zip
+  - wget -O Adafruit_ADS1X15-master.zip https://github.com/adafruit/Adafruit_ADS1X15/archive/master.zip
+  - wget -O MAX6675-library-master.zip https://github.com/adafruit/MAX6675-library/archive/master.zip
   - unzip Arduino-Temperature-Control-Library-master.zip
   - unzip NTPClient.zip
   - unzip ESP8266Ping.zip
+  - unzip Adafruit_ADS1X15-master.zip
+  - unzip MAX6675-library-master.zip
   - mv ESP8266Ping-master $HOME/Arduino/libraries/
   - mv NTPClient-master $HOME/Arduino/libraries/
   - mv Arduino-Temperature-Control-Library-master $HOME/Arduino/libraries/
+  - mv Adafruit_ADS1X15-master $HOME/Arduino/libraries/
+  - mv MAX6675-library-master $HOME/Arduino/libraries/
 install:
   - CURRENT_DIR=$PWD
   - echo "Current location " ${CURRENT_DIR}
