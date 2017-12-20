@@ -39,11 +39,12 @@ install:
 script:
     - echo "#################################################################################"
     - echo ""
-    - echo "Checking ${BOARD}"
-    - arduino --verify --board ${BOARD} $PWD/Boiler/Boiler.ino
-    - arduino --verify --board ${BOARD} $PWD/Joystick/Joystick.ino
-    - arduino --verify --board ${BOARD} $PWD/Machine/Machine-Side.ino
-    - arduino --verify --board ${BOARD} $PWD/Oven/Oven.ino
+    - echo "Checking ${BOARD} ${PROJ}"
+    - arduino --verify --board ${BOARD} $PWD/${PROJ}
+    # - arduino --verify --board ${BOARD} $PWD/Boiler/Boiler.ino
+    # - arduino --verify --board ${BOARD} $PWD/Joystick/Joystick.ino
+    # - arduino --verify --board ${BOARD} $PWD/Machine/Machine-Side.ino
+    # - arduino --verify --board ${BOARD} $PWD/Oven/Oven.ino
     # - echo "Bioiler Checking nodeMCU v2 - 1.0"
     # - arduino --verify --board esp8266:esp8266:nodemcuv2:CpuFrequency=80,UploadSpeed=921600,FlashSize=4M3M $PWD/Boiler/Boiler.ino
     # - echo "Bioiler Checking nodeMCU v0 - 0.9"
@@ -63,6 +64,10 @@ script:
 env:
     - BOARD=esp8266:esp8266:nodemcuv2:CpuFrequency=80,UploadSpeed=921600,FlashSize=4M3M #nodeMCU v2 - 1.0
     - BOARD=esp8266:esp8266:nodemcu:CpuFrequency=80,UploadSpeed=921600,FlashSize=4M3M   #nodeMCU v0 - 0.9
+    - PROJ=Boiler/Boiler.ino
+    - PROJ=Joystick/Joystick.ino
+    - PROJ=Machine/Machine-Side.ino
+    - PROJ=Oven/Oven.ino
 notifications:
   email:
     on_success: change  # options: [always|never|change] default: always
