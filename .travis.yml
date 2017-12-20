@@ -62,12 +62,14 @@ script:
     # - echo "OVEN Checking nodeMCU v0 - 0.9"
     # - arduino --verify --board esp8266:esp8266:nodemcu:CpuFrequency=80,UploadSpeed=921600,FlashSize=4M3M $PWD/Oven/Oven.ino
 env:
-    - BOARD=esp8266:esp8266:nodemcuv2:CpuFrequency=80,UploadSpeed=921600,FlashSize=4M3M #nodeMCU v2 - 1.0
-    - BOARD=esp8266:esp8266:nodemcu:CpuFrequency=80,UploadSpeed=921600,FlashSize=4M3M   #nodeMCU v0 - 0.9
+  global:
     - PROJ=Boiler/Boiler.ino
     - PROJ=Joystick/Joystick.ino
     - PROJ=Machine/Machine-Side.ino
     - PROJ=Oven/Oven.ino
+  matrix:
+    - BOARD=esp8266:esp8266:nodemcuv2:CpuFrequency=80,UploadSpeed=921600,FlashSize=4M3M #nodeMCU v2 - 1.0
+    - BOARD=esp8266:esp8266:nodemcu:CpuFrequency=80,UploadSpeed=921600,FlashSize=4M3M   #nodeMCU v0 - 0.9
 notifications:
   email:
     on_success: change  # options: [always|never|change] default: always
